@@ -10,8 +10,8 @@ class Verify:
 
     def start_verification(self, params=None, **kwargs):
         response = self._client.post(
-            self._client.api_host(), 
-            "/verify/json", 
+            self._client.api_host(),
+            "/verify/json",
             params or kwargs,
             **Verify.defaults,
         )
@@ -69,7 +69,10 @@ class Verify:
 
     def psd2(self, params=None, **kwargs):
         response = self._client.post(
-            self._client.api_host(), "/verify/psd2/json", params or kwargs, **Verify.defaults,
+            self._client.api_host(),
+            "/verify/psd2/json",
+            params or kwargs,
+            **Verify.defaults,
         )
 
         self.check_for_error(response)
@@ -79,4 +82,6 @@ class Verify:
         if response['status'] == '7':
             raise BlockedNumberError('Error code 7: The number you are trying to verify is blocked for verification.')
         elif 'error_text' in response:
-            raise VerifyError(f'Verify API method failed with status: {response["status"]} and error: {response["error_text"]}')
+            raise VerifyError(
+                f'Verify API method failed with status: {response["status"]} and error: {response["error_text"]}'
+            )

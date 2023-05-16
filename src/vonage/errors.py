@@ -77,3 +77,11 @@ class SipError(ClientError):
 
 class InvalidInputError(ClientError):
     """The input that was provided was invalid."""
+
+
+class InvalidAuthenticationTypeError(ClientError):
+    """An authentication method was specified that is not allowed."""
+
+
+class Verify2Error(ClientError):
+    """An error relating to the Verify (V2) API."""
