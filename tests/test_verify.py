@@ -246,40 +246,6 @@ def test_start_psd2_verification_error(verify):
 
 
 @responses.activate
-def test_start_verification_blacklisted_error_with_network(client):
-    stub(
-        responses.POST,
-        "https://api.nexmo.com/verify/json",
-        fixture_path="verify/blocked_with_network.json",
-    )
-
-    params = {"number": "447525856424", "brand": "MyApp"}
-    with pytest.raises(BlockedNumberError) as err:
-        client.verify.psd2(params)
-    assert (
-        str(err.value)
-        == 'Error code 7: The number you are trying to verify is blocked for verification.'
-    )
-
-
-@responses.activate
-def test_start_verification_blacklisted_error_with_request_id(client):
-    stub(
-        responses.POST,
-        "https://api.nexmo.com/verify/json",
-        fixture_path="verify/blocked_with_request_id.json",
-    )
-
-    params = {"number": "447525856424", "brand": "MyApp"}
-    with pytest.raises(BlockedNumberError) as err:
-        client.verify.psd2(params)
-    assert (
-        str(err.value)
-        == 'Error code 7: The number you are trying to verify is blocked for verification.'
-    )
-
-
-@responses.activate
 def test_start_verification_blacklisted_error_with_network_and_request_id(client):
     stub(
         responses.POST,
@@ -289,42 +255,7 @@ def test_start_verification_blacklisted_error_with_network_and_request_id(client
 
     params = {"number": "447525856424", "brand": "MyApp"}
     with pytest.raises(BlockedNumberError) as err:
-        client.verify.psd2(params)
-    assert (
-        str(err.value)
-        == 'Error code 7: The number you are trying to verify is blocked for verification.'
-    )
-
-
-@responses.activate
-def test_start_psd2_verification_blacklisted_error_with_network(client):
-    stub(
-        responses.POST,
-        "https://api.nexmo.com/verify/psd2/json",
-        fixture_path="verify/blocked_with_network.json",
-    )
-    params = {"number": "447525856424", "brand": "MyApp"}
-
-    with pytest.raises(BlockedNumberError) as err:
-        client.verify.psd2(params)
-    assert (
-        str(err.value)
-        == 'Error code 7: The number you are trying to verify is blocked for verification.'
-    )
-
-
-@responses.activate
-def test_start_psd2_verification_blacklisted_error_with_request_id(client):
-    stub(
-        responses.POST,
-        "https://api.nexmo.com/verify/psd2/json",
-        fixture_path="verify/blocked_with_request_id.json",
-    )
-
-    params = {"number": "447525856424", "brand": "MyApp"}
-
-    with pytest.raises(BlockedNumberError) as err:
-        client.verify.psd2(params)
+        client.verify.start_verification(params)
     assert (
         str(err.value)
         == 'Error code 7: The number you are trying to verify is blocked for verification.'

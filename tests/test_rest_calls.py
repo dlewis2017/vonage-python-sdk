@@ -104,7 +104,12 @@ def test_patch(client, dummy_data):
 
 @responses.activate
 def test_patch_no_content(client, dummy_data):
-    stub(responses.PATCH, f"https://api.nexmo.com/v2/project", status_code=204)
+    stub(
+        responses.PATCH,
+        f"https://api.nexmo.com/v2/project",
+        status_code=204,
+        fixture_path='no_content.json',
+    )
     host = "api.nexmo.com"
     request_uri = "/v2/project"
     params = {"test_param_1": "test1", "test_param_2": "test2"}
