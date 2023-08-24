@@ -3,12 +3,13 @@ from datetime import datetime
 from ._internal import _format_date_param
 from .errors import SmsError, PartialFailureError
 
+
 class Sms:
     defaults = {'auth_type': 'params', 'body_is_json': False}
 
     def __init__(self, client):
         self._client = client
-    
+
     def send_message(self, params):
         """
         Send an SMS message.
@@ -16,9 +17,9 @@ class Sms:
         :param dict params: A dict of values described at `Send an SMS <https://developer.vonage.com/api/sms#send-an-sms>`_
         """
         response_data = self._client.post(
-            self._client.host(), 
-            "/sms/json", 
-            params, 
+            self._client.host(),
+            "/sms/json",
+            params,
             supports_signature_auth=True,
             **Sms.defaults,
         )
@@ -33,18 +34,22 @@ class Sms:
     def check_for_partial_failure(self, response_data):
         successful_messages = 0
         total_messages = int(response_data['message-count'])
-        
+
         for message in response_data['messages']:
             if message['status'] == '0':
                 successful_messages += 1
-        if successful_messages < total_messages: 
-            raise PartialFailureError('Sms.send_message method partially failed. Not all of the message sent successfully.')
+        if successful_messages < total_messages:
+            raise PartialFailureError(
+                'Sms.send_message method partially failed. Not all of the message sent successfully.'
+            )
 
     def check_for_error(self, response_data):
         message = response_data['messages'][0]
         if int(message['status']) != 0:
-                raise SmsError(f'Sms.send_message method failed with error code {message["status"]}: {message["error-text"]}')
-    
+            raise SmsError(
+                f'Sms.send_message method failed with error code {message["status"]}: {message["error-text"]}'
+            )
+
     def submit_sms_conversion(self, message_id, delivered=True, timestamp=None):
         """
         Notify Vonage that an SMS was successfully received.
@@ -60,8 +65,10 @@ class Sms:
         params = {
             "message-id": message_id,
             "delivered": delivered,
-            "timestamp": timestamp or datetime.now(pytz.utc)
+            "timestamp": timestamp or datetime.now(pytz.utc),
         }
         # Ensure timestamp is a string:
         _format_date_param(params, "timestamp")
-        return self._client.post(self._client.api_host(), "/conversions/sms", params, **Sms.defaults)
+        return self._client.post(
+            self._client.api_host(), "/conversions/sms", params, **Sms.defaults
+        )

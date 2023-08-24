@@ -181,7 +181,10 @@ def test_list_streams(client, dummy_data):
 
 @responses.activate
 def test_change_stream_layout(client, dummy_data):
-    stub(responses.PUT, f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/stream")
+    stub(
+        responses.PUT,
+        f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/stream",
+    )
 
     items = [{'id': 'stream-1234', 'layoutClassList': ["full"]}]
 
@@ -192,9 +195,14 @@ def test_change_stream_layout(client, dummy_data):
 
 @responses.activate
 def test_send_signal_to_all_participants(client, dummy_data):
-    stub(responses.POST, f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/signal")
+    stub(
+        responses.POST,
+        f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/signal",
+    )
 
-    assert isinstance(client.video.send_signal(session_id, type='chat', data='hello from a test case'), dict)
+    assert isinstance(
+        client.video.send_signal(session_id, type='chat', data='hello from a test case'), dict
+    )
     assert request_user_agent() == dummy_data.user_agent
     assert request_content_type() == "application/json"
 
@@ -207,7 +215,9 @@ def test_send_signal_to_single_participant(client, dummy_data):
     )
 
     assert isinstance(
-        client.video.send_signal(session_id, type='chat', data='hello from a test case', connection_id=connection_id),
+        client.video.send_signal(
+            session_id, type='chat', data='hello from a test case', connection_id=connection_id
+        ),
         dict,
     )
     assert request_user_agent() == dummy_data.user_agent
@@ -282,7 +292,10 @@ def test_disable_mute_all_streams(client, dummy_data):
     )
     assert isinstance(response, dict)
     assert request_user_agent() == dummy_data.user_agent
-    assert request_body() == b'{"active": false, "excludedStreamIds": ["excluded_stream_id_1", "excluded_stream_id_2"]}'
+    assert (
+        request_body()
+        == b'{"active": false, "excludedStreamIds": ["excluded_stream_id_1", "excluded_stream_id_2"]}'
+    )
     assert response['createdAt'] == 1414642898000
 
 
@@ -309,7 +322,9 @@ def test_create_new_archive(client, dummy_data):
         fixture_path="video/create_archive.json",
     )
 
-    response = client.video.create_archive(session_id=session_id, name='my_new_archive', outputMode='individual')
+    response = client.video.create_archive(
+        session_id=session_id, name='my_new_archive', outputMode='individual'
+    )
     assert isinstance(response, dict)
     assert request_user_agent() == dummy_data.user_agent
     assert response['name'] == 'my_new_archive'
@@ -353,7 +368,9 @@ def test_add_stream_to_archive(client, dummy_data):
     )
 
     assert (
-        client.video.add_stream_to_archive(archive_id=archive_id, stream_id='1234', has_audio=True, has_video=True)
+        client.video.add_stream_to_archive(
+            archive_id=archive_id, stream_id='1234', has_audio=True, has_video=True
+        )
         == None
     )
     assert request_user_agent() == dummy_data.user_agent
@@ -389,7 +406,10 @@ def test_stop_archive(client, dummy_data):
 
 @responses.activate
 def test_change_archive_layout(client, dummy_data):
-    stub(responses.PUT, f"https://video.api.vonage.com/v2/project/{client.application_id}/archive/{archive_id}/layout")
+    stub(
+        responses.PUT,
+        f"https://video.api.vonage.com/v2/project/{client.application_id}/archive/{archive_id}/layout",
+    )
 
     params = {'type': 'bestFit', 'screenshareType': 'horizontalPresentation'}
 
@@ -416,7 +436,11 @@ def test_create_sip_call(client):
 
 @responses.activate
 def test_create_sip_call_not_found_error(client):
-    stub(responses.POST, f'https://video.api.vonage.com/v2/project/{client.application_id}/dial', status_code=404)
+    stub(
+        responses.POST,
+        f'https://video.api.vonage.com/v2/project/{client.application_id}/dial',
+        status_code=404,
+    )
     sip = {'uri': 'sip:user@sip.partner.com;transport=tls'}
     with pytest.raises(ClientError):
         client.video.create_sip_call('an-invalid-session-id', 'my_token', sip)
@@ -463,7 +487,10 @@ def test_play_dtmf_invalid_session_id_error(client):
 
     with pytest.raises(ClientError) as err:
         client.video.play_dtmf(session_id, '1234')
-    assert str(err.value) == "{'code': 400, 'message': 'One of the properties digits or sessionId is invalid.'}"
+    assert (
+        str(err.value)
+        == "{'code': 400, 'message': 'One of the properties digits or sessionId is invalid.'}"
+    )
 
 
 def test_play_dtmf_invalid_input_error(client):
@@ -495,7 +522,9 @@ def test_list_broadcasts_options(client):
         fixture_path='video/list_broadcasts.json',
     )
 
-    broadcasts = client.video.list_broadcasts(count=1, session_id='2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4')
+    broadcasts = client.video.list_broadcasts(
+        count=1, session_id='2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4'
+    )
     assert broadcasts['count'] == '1'
     assert broadcasts['items'][0]['sessionId'] == '2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4'
     assert broadcasts['items'][0]['id'] == '1748b7070a81464c9759c46ad10d3734'
@@ -533,7 +562,15 @@ def test_start_broadcast_required_params(client):
 
     params = {
         "sessionId": "2_MX40NTMyODc3Mn5-fg",
-        "outputs": {"rtmp": [{"id": "foo", "serverUrl": "rtmps://myfooserver/myfooapp", "streamName": "myfoostream"}]},
+        "outputs": {
+            "rtmp": [
+                {
+                    "id": "foo",
+                    "serverUrl": "rtmps://myfooserver/myfooapp",
+                    "streamName": "myfoostream",
+                }
+            ]
+        },
     }
 
     broadcast = client.video.start_broadcast(params)
@@ -559,7 +596,15 @@ def test_start_broadcast_all_params(client):
             "screenshareType": "horizontalPresentation",
         },
         "maxDuration": 5400,
-        "outputs": {"rtmp": [{"id": "foo", "serverUrl": "rtmps://myfooserver/myfooapp", "streamName": "myfoostream"}]},
+        "outputs": {
+            "rtmp": [
+                {
+                    "id": "foo",
+                    "serverUrl": "rtmps://myfooserver/myfooapp",
+                    "streamName": "myfoostream",
+                }
+            ]
+        },
         "resolution": "1920x1080",
         "streamMode": "manual",
         "multiBroadcastTag": "foo",
@@ -644,5 +689,8 @@ def test_remove_stream_from_archive(client, dummy_data):
         status_code=204,
     )
 
-    assert client.video.remove_stream_from_broadcast(broadcast_id=broadcast_id, stream_id='1234') == None
+    assert (
+        client.video.remove_stream_from_broadcast(broadcast_id=broadcast_id, stream_id='1234')
+        == None
+    )
     assert request_user_agent() == dummy_data.user_agent

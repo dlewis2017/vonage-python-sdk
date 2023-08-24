@@ -1,4 +1,10 @@
-from .errors import InvalidRoleError, TokenExpiryError, InvalidOptionsError, SipError, InvalidInputError
+from .errors import (
+    InvalidRoleError,
+    TokenExpiryError,
+    InvalidOptionsError,
+    SipError,
+    InvalidInputError,
+)
 
 import jwt
 import re
@@ -20,12 +26,22 @@ class Video:
             session_options = {}
 
         params = {'archiveMode': 'manual', 'p2p.preference': 'disabled', 'location': None}
-        if 'archive_mode' in session_options and session_options['archive_mode'] not in Video.archive_mode_values:
-            raise InvalidOptionsError(f'Invalid archive_mode value. Must be one of {Video.archive_mode_values}.')
+        if (
+            'archive_mode' in session_options
+            and session_options['archive_mode'] not in Video.archive_mode_values
+        ):
+            raise InvalidOptionsError(
+                f'Invalid archive_mode value. Must be one of {Video.archive_mode_values}.'
+            )
         elif 'archive_mode' in session_options:
             params['archiveMode'] = session_options['archive_mode']
-        if 'media_mode' in session_options and session_options['media_mode'] not in Video.media_mode_values:
-            raise InvalidOptionsError(f'Invalid media_mode value. Must be one of {Video.media_mode_values}.')
+        if (
+            'media_mode' in session_options
+            and session_options['media_mode'] not in Video.media_mode_values
+        ):
+            raise InvalidOptionsError(
+                f'Invalid media_mode value. Must be one of {Video.media_mode_values}.'
+            )
         elif 'media_mode' in session_options:
             if session_options['media_mode'] == 'routed':
                 params['p2p.preference'] = 'disabled'
@@ -40,7 +56,11 @@ class Video:
             params['location'] = session_options['location']
 
         session = self._client.post(
-            self._client.video_host(), '/session/create', params, auth_type=Video.auth_type, body_is_json=False
+            self._client.video_host(),
+            '/session/create',
+            params,
+            auth_type=Video.auth_type,
+            body_is_json=False,
         )[0]
 
         media_mode = self.get_media_mode(params['p2p.preference'])
@@ -83,15 +103,15 @@ class Video:
 
     def send_signal(self, session_id, type, data, connection_id=None):
         if connection_id:
-            request_uri = (
-                f'/v2/project/{self._client.application_id}/session/{session_id}/connection/{connection_id}/signal'
-            )
+            request_uri = f'/v2/project/{self._client.application_id}/session/{session_id}/connection/{connection_id}/signal'
         else:
             request_uri = f'/v2/project/{self._client.application_id}/session/{session_id}/signal'
 
         params = {'type': type, 'data': data}
 
-        return self._client.post(self._client.video_host(), request_uri, params, auth_type=Video.auth_type)
+        return self._client.post(
+            self._client.video_host(), request_uri, params, auth_type=Video.auth_type
+        )
 
     def disconnect_client(self, session_id, connection_id):
         return self._client.delete(
@@ -119,7 +139,9 @@ class Video:
         )
 
     def disable_mute_all_streams(self, session_id, excluded_stream_ids: list = []):
-        return self.mute_all_streams(session_id, active=False, excluded_stream_ids=excluded_stream_ids)
+        return self.mute_all_streams(
+            session_id, active=False, excluded_stream_ids=excluded_stream_ids
+        )
 
     def list_archives(self, filter_params=None, **filter_kwargs):
         return self._client.get(
@@ -266,7 +288,9 @@ class Video:
             auth_type=Video.auth_type,
         )
 
-    def add_stream_to_broadcast(self, broadcast_id: str, stream_id: str, has_audio=True, has_video=True):
+    def add_stream_to_broadcast(
+        self, broadcast_id: str, stream_id: str, has_audio=True, has_video=True
+    ):
         params = {'addStream': stream_id, 'hasAudio': has_audio, 'hasvideo': has_video}
 
         return self._client.patch(
@@ -316,7 +340,9 @@ class Video:
 
         self.validate_client_token_options(claims)
         headers = {'typ': 'JWT', 'alg': 'RS256'}
-        return jwt.encode(payload=claims, key=self._client._private_key, algorithm='RS256', headers=headers)
+        return jwt.encode(
+            payload=claims, key=self._client._private_key, algorithm='RS256', headers=headers
+        )
 
     def validate_client_token_options(self, claims):
         now = int(time())

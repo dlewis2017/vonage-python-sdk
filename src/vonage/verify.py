@@ -33,11 +33,17 @@ class Verify:
     def search(self, request=None):
         if type(request) == str:
             response = self._client.get(
-                self._client.api_host(), "/verify/search/json", {"request_id": request}, auth_type=Verify.auth_type
+                self._client.api_host(),
+                "/verify/search/json",
+                {"request_id": request},
+                auth_type=Verify.auth_type,
             )
         elif type(request) == list:
             response = self._client.get(
-                self._client.api_host(), "/verify/search/json", {"request_ids": request}, auth_type=Verify.auth_type
+                self._client.api_host(),
+                "/verify/search/json",
+                {"request_ids": request},
+                auth_type=Verify.auth_type,
             )
         else:
             raise VerifyError('At least one request ID must be provided.')
@@ -80,7 +86,9 @@ class Verify:
 
     def check_for_error(self, response):
         if response['status'] == '7':
-            raise BlockedNumberError('Error code 7: The number you are trying to verify is blocked for verification.')
+            raise BlockedNumberError(
+                'Error code 7: The number you are trying to verify is blocked for verification.'
+            )
         elif 'error_text' in response:
             raise VerifyError(
                 f'Verify API method failed with status: {response["status"]} and error: {response["error_text"]}'

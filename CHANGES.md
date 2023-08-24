@@ -1,3 +1,27 @@
+# 3.9.0
+- Dropped support for Python 3.7 as it's end-of-life and no longer receiving security updates
+
+# 3.8.0
+- Adding support for the [Users component of the Vonage Application API](https://developer.vonage.com/en/api/application.v2#User)
+
+# 3.7.1
+- Fixing dependency version to a specific major version
+
+# 3.7.0
+- Adding support for the [Vonage Meetings API](https://developer.vonage.com/en/meetings/overview)
+- Adding partial support for the [Vonage Proactive Connect API](https://developer.vonage.com/en/proactive-connect/overview) - supporting API methods relating to `lists`, `items` and `events`
+- Returning a more descriptive (non-internal) error message if invalid values are provided for `application_id` and/or `private_key` when instantiating a Vonage client object
+
+# 3.6.0
+- Adding support for the [Vonage Subaccounts API](https://developer.vonage.com/en/account/subaccounts/overview)
+
+# 3.5.2
+- Using the [Vonage JWT Generator](https://github.com/Vonage/vonage-python-jwt) instead of `PyJWT` for generating JWTs.
+- Other internal refactoring and enhancements
+
+# 3.5.1
+- Updating the internal use of the `fraud_check` parameter in the Vonage Verify V2 API
+
 # 3.5.0
 - Adding support for V2 of the Vonage Verify API
     - Multiple authentication channels are supported (sms, voice, email, whatsapp, whatsapp interactive messages and silent authentication)

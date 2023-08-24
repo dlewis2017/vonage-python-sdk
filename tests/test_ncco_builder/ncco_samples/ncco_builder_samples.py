@@ -25,9 +25,13 @@ connect_advancedMachineDetection = Ncco.Connect(
 
 talk_minimal = Ncco.Talk(text='hello')
 
-talk = Ncco.Talk(text='hello', bargeIn=True, loop=3, level=0.5, language='en-GB', style=1, premium=True)
+talk = Ncco.Talk(
+    text='hello', bargeIn=True, loop=3, level=0.5, language='en-GB', style=1, premium=True
+)
 
-stream = Ncco.Stream(streamUrl='https://example.com/stream/music.mp3', level=0.1, bargeIn=True, loop=10)
+stream = Ncco.Stream(
+    streamUrl='https://example.com/stream/music.mp3', level=0.1, bargeIn=True, loop=10
+)
 
 input = Ncco.Input(
     type=['dtmf', 'speech'],
@@ -45,7 +49,9 @@ input = Ncco.Input(
     eventMethod='put',
 )
 
-notify = Ncco.Notify(payload={"message": "world"}, eventUrl=["http://example.com"], eventMethod='PUT')
+notify = Ncco.Notify(
+    payload={"message": "world"}, eventUrl=["http://example.com"], eventMethod='PUT'
+)
 
 basic_ncco = [{"action": "talk", "text": "hello"}]
 
@@ -116,5 +122,10 @@ insane_ncco = [
         },
         'type': ['dtmf', 'speech'],
     },
-    {'action': 'notify', 'eventMethod': 'PUT', 'eventUrl': ['http://example.com'], 'payload': {'message': 'world'}},
+    {
+        'action': 'notify',
+        'eventMethod': 'PUT',
+        'eventUrl': ['http://example.com'],
+        'payload': {'message': 'world'},
+    },
 ]

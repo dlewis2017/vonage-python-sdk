@@ -1,10 +1,9 @@
 # Vonage Server SDK for Python
 
-<img src="https://developer.nexmo.com/assets/images/Vonage_Nexmo.svg" height="48px" alt="Nexmo is now known as Vonage" />
+<img src="https://developer.nexmo.com/images/logos/vbc-logo.svg" height="48px" alt="Vonage" />
 
 [![PyPI version](https://badge.fury.io/py/vonage.svg)](https://badge.fury.io/py/vonage)
 [![Build Status](https://github.com/Vonage/vonage-python-sdk/workflows/Build/badge.svg)](https://github.com/Vonage/vonage-python-sdk/actions)
-[![codecov](https://codecov.io/gh/Vonage/vonage-python-sdk/branch/master/graph/badge.svg)](https://codecov.io/gh/Vonage/vonage-python-sdk)
 [![Python versions supported](https://img.shields.io/pypi/pyversions/vonage.svg)](https://pypi.python.org/pypi/vonage)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
@@ -19,12 +18,16 @@ need a Vonage account. Sign up [for free at vonage.com][signup].
 - [NCCO Builder](#ncco-builder)
 - [Verify V2 API](#verify-v2-api)
 - [Verify V1 API](#verify-v1-api)
+- [Meetings API](#meetings-api)
 - [Number Insight API](#number-insight-api)
+- [Proactive Connect API](#proactive-connect-api)
 - [Account API](#account-api)
+- [Subaccounts API](#subaccounts-api)
 - [Number Management API](#number-management-api)
 - [Pricing API](#pricing-api)
 - [Managing Secrets](#managing-secrets)
 - [Application API](#application-api)
+- [Users API](#users-api)
 - [Validating Webhook Signatures](#validate-webhook-signatures)
 - [JWT Parameters](#jwt-parameters)
 - [Overriding API Attributes](#overriding-api-attributes)
@@ -161,7 +164,7 @@ The delivery receipt URL can be unset by sending an empty string.
 
 ## Messages API
 
-The Messages API is an API that allows you to send messages via SMS, MMS, WhatsApp, Messenger and Viber. Call the API from your Python code by 
+The Messages API is an API that allows you to send messages via SMS, MMS, WhatsApp, Messenger and Viber. Call the API from your Python code by
 passing a dict of parameters into the `client.messages.send_message()` method.
 
 It accepts JWT or API key/secret authentication.
@@ -171,9 +174,9 @@ Some basic samples are below. For more detailed information and code snippets, p
 ### Send an SMS
 ```python
 responseData = client.messages.send_message({
-        'channel': 'sms', 
-        'message_type': 'text', 
-        'to': '447123456789', 
+        'channel': 'sms',
+        'message_type': 'text',
+        'to': '447123456789',
         'from': 'Vonage',
         'text': 'Hello from Vonage'
     })
@@ -184,9 +187,9 @@ Note: only available in the US. You will need a 10DLC number to send an MMS mess
 
 ```python
 client.messages.send_message({
-        'channel': 'mms', 
-        'message_type': 'image', 
-        'to': '11112223333', 
+        'channel': 'mms',
+        'message_type': 'image',
+        'to': '11112223333',
         'from': '1223345567',
         'image': {'url': 'https://example.com/image.jpg', 'caption': 'Test Image'}
     })
@@ -200,9 +203,9 @@ type to a user if they have messaged your business number in the last 24 hours.
 
 ```python
 client.messages.send_message({
-        'channel': 'whatsapp', 
-        'message_type': 'audio', 
-        'to': '447123456789', 
+        'channel': 'whatsapp',
+        'message_type': 'audio',
+        'to': '447123456789',
         'from': '440123456789',
         'audio': {'url': 'https://example.com/audio.mp3'}
     })
@@ -215,9 +218,9 @@ You will need to link your Facebook business page to your Vonage account in the 
 
 ```python
 client.messages.send_message({
-        'channel': 'messenger', 
-        'message_type': 'video', 
-        'to': '594123123123123', 
+        'channel': 'messenger',
+        'message_type': 'video',
+        'to': '594123123123123',
         'from': '1012312312312',
         'video': {'url': 'https://example.com/video.mp4'}
     })
@@ -409,7 +412,7 @@ When using the `connect` action, use the parameter `from_` to specify the recipi
 
 ## Verify V2 API
 
-V2 of the Vonage Verify API lets you send verification codes via SMS, WhatsApp, Voice and Email
+V2 of the Vonage Verify API lets you send verification codes via SMS, WhatsApp, Voice and Email.
 
 You can also verify a user by WhatsApp Interactive Message or by Silent Authentication on their mobile device.
 
@@ -417,7 +420,7 @@ You can also verify a user by WhatsApp Interactive Message or by Silent Authenti
 
 ```python
 params = {
-    'brand': 'ACME, Inc', 
+    'brand': 'ACME, Inc',
     'workflow': [{'channel': 'sms', 'to': '447700900000'}]
 }
 verify_request = verify2.new_request(params)
@@ -427,7 +430,7 @@ verify_request = verify2.new_request(params)
 
 ```python
 params = {
-    'brand': 'ACME, Inc', 
+    'brand': 'ACME, Inc',
     'workflow': [
         {'channel': 'silent_auth', 'to': '447700900000'},
         {'channel': 'email', 'to': 'customer@example.com', 'from': 'business@example.com'}
@@ -456,8 +459,8 @@ This feature is only enabled if you have requested for it to be added to your ac
 
 ```python
 params = {
-    'brand': 'ACME, Inc', 
-    'fraud_check': False, 
+    'brand': 'ACME, Inc',
+    'fraud_check': False,
     'workflow': [{'channel': 'sms', 'to': '447700900000'}]
 }
 verify_request = verify2.new_request(params)
@@ -579,6 +582,144 @@ else:
     print("Error: %s" % response["error_text"])
 ```
 
+## Meetings API
+
+Full docs for the [Meetings API are available here](https://developer.vonage.com/en/meetings/overview).
+
+### Create a meeting room
+
+```python
+# Instant room
+params = {'display_name': 'my_test_room'}
+meeting = client.meetings.create_room(params)
+
+# Long term room
+params = {'display_name': 'test_long_term_room', 'type': 'long_term', 'expires_at': '2023-01-30T00:47:04+0000'}
+meeting = client.meetings.create_room(params)
+```
+
+### Get all meeting rooms
+
+```python
+client.meetings.list_rooms()
+```
+
+### Get a room by id
+
+```python
+client.meetings.get_room('MY_ROOM_ID')
+```
+
+### Update a long term room
+
+```python
+params = {
+    'update_details': {
+        "available_features": {
+            "is_recording_available": False,
+            "is_chat_available": False,
+        }
+    }
+}
+meeting = client.meetings.update_room('MY_ROOM_ID', params)
+```
+
+### Get all recordings for a session
+
+```python
+session = client.meetings.get_session_recordings('MY_SESSION_ID')
+```
+
+### Get a recording by id
+
+```python
+recording = client.meetings.get_recording('MY_RECORDING_ID')
+```
+
+### Delete a recording
+
+```python
+client.meetings.delete_recording('MY_RECORDING_ID')
+```
+
+### List dial-in numbers
+
+```python
+numbers = client.meetings.list_dial_in_numbers()
+```
+
+### Create a theme
+
+```python
+params = {
+    'theme_name': 'my_theme',
+    'main_color': '#12f64e',
+    'brand_text': 'My Company',
+    'short_company_url': 'my-company',
+}
+theme = client.meetings.create_theme(params)
+```
+
+### Add a theme to a room
+
+```python
+meetings.add_theme_to_room('MY_ROOM_ID', 'MY_THEME_ID')
+```
+
+### List themes
+
+```python
+themes = client.meetings.list_themes()
+```
+
+### Get theme information
+
+```python
+theme = client.meetings.get_theme('MY_THEME_ID')
+```
+
+### Delete a theme
+
+```python
+client.meetings.delete_theme('MY_THEME_ID')
+```
+
+### Update a theme
+
+```python
+params = {
+    'update_details': {
+        'theme_name': 'updated_theme',
+        'main_color': '#FF0000',
+        'brand_text': 'My Updated Company Name',
+        'short_company_url': 'updated_company_url',
+    }
+}
+theme = client.meetings.update_theme('MY_THEME_ID', params)
+```
+
+### List all rooms using a specified theme
+
+```python
+rooms = client.meetings.list_rooms_with_theme_id('MY_THEME_ID')
+```
+
+### Update the default theme for your application
+
+```python
+response = client.meetings.update_application_theme('MY_THEME_ID')
+```
+
+### Upload a logo to a theme
+
+```python
+response = client.meetings.upload_logo_to_theme(
+        theme_id='MY_THEME_ID',
+        path_to_image='path/to/my/image.png',
+        logo_type='white', # 'white', 'colored' or 'favicon'
+    )
+```
+
 ## Number Insight API
 
 ### Basic Number Insight
@@ -605,6 +746,94 @@ client.number_insight.get_advanced_number_insight(number='447700900000')
 
 Docs: [https://developer.nexmo.com/api/number-insight#getNumberInsightAdvanced](https://developer.nexmo.com/api/number-insight?utm_source=DEV_REL&utm_medium=github&utm_campaign=python-client-library#getNumberInsightAdvanced)
 
+## Proactive Connect API
+
+Full documentation for the [Proactive Connect API](https://developer.vonage.com/en/proactive-connect/overview) is available here.
+
+These methods help you manage lists of contacts when using the API:
+
+### Find all lists
+```python
+client.proactive_connect.list_all_lists()
+```
+
+### Create a list
+Lists can be created manually or imported from Salesforce.
+
+```python
+params = {'name': 'my list', 'description': 'my description', 'tags': ['vip']}
+client.proactive_connect.create_list(params)
+```
+
+### Get a list
+```python
+client.proactive_connect.get_list(LIST_ID)
+```
+
+### Update a list
+```python
+params = {'name': 'my list', 'tags': ['sport', 'football']}
+client.proactive_connect.update_list(LIST_ID, params)
+```
+
+### Delete a list
+```python
+client.proactive_connect.delete_list(LIST_ID)
+```
+
+### Sync a list from an external datasource
+```python
+params = {'name': 'my list', 'tags': ['sport', 'football']}
+client.proactive_connect.sync_list_from_datasource(LIST_ID)
+```
+
+These methods help you work with individual items in a list:
+### Find all items in a list
+```python
+client.proactive_connect.list_all_items(LIST_ID)
+```
+
+### Create a new list item
+```python
+data = {'firstName': 'John', 'lastName': 'Doe', 'phone': '123456789101'}
+client.proactive_connect.create_item(LIST_ID, data)
+```
+
+### Get a list item
+```python
+client.proactive_connect.get_item(LIST_ID, ITEM_ID)
+```
+
+### Update a list item
+```python
+data = {'firstName': 'John', 'lastName': 'Doe', 'phone': '447007000000'}
+client.proactive_connect.update_item(LIST_ID, ITEM_ID, data)
+```
+
+### Delete a list item
+```python
+client.proactive_connect.delete_item(LIST_ID, ITEM_ID)
+```
+
+### Download all items in a list as a .csv file
+```python
+FILE_PATH = 'path/to/the/downloaded/file/location'
+client.proactive_connect.download_list_items(LIST_ID, FILE_PATH)
+```
+
+### Upload items from a .csv file into a list
+```python
+FILE_PATH = 'path/to/the/file/to/upload/location'
+client.proactive_connect.upload_list_items(LIST_ID, FILE_PATH)
+```
+
+This method helps you work with events emitted by the Proactive Connect API when in use:
+
+### List all events
+```python
+client.proactive_connect.list_events()
+```
+
 ## Account API
 
 ### Get your account balance
@@ -616,7 +845,151 @@ client.account.get_balance()
 This feature is only enabled when you enable auto-reload for your account in the dashboard.
 ```python
 # trx is the reference from when auto-reload was enabled and money was added
-client.account.topup(trx=transaction_reference) 
+client.account.topup(trx=transaction_reference)
+```
+
+## Subaccounts API
+
+This API is used to create and configure subaccounts related to your primary account and transfer credit, balances and bought numbers between accounts.
+
+The subaccounts API is disabled by default. If you want to use subaccounts, [contact support](https://api.support.vonage.com) to have the API enabled on your account.
+
+### Get a list of all subaccounts
+
+```python
+client.subaccounts.list_subaccounts()
+```
+
+### Create a subaccount
+
+```python
+client.subaccounts.create_subaccount(name='my subaccount')
+
+# With options
+client.subaccounts.create_subaccount(
+    name='my subaccount',
+    secret='Password123',
+    use_primary_account_balance=False,
+)
+```
+
+### Get information about a subaccount
+
+```python
+client.subaccounts.get_subaccount(SUBACCOUNT_API_KEY)
+```
+
+### Modify a subaccount
+
+```python
+client.subaccounts.modify_subaccount(
+    SUBACCOUNT_KEY,
+    suspended=True,
+    use_primary_account_balance=False,
+    name='my modified subaccount',
+)
+```
+
+### List credit transfers between accounts
+
+All fields are optional. If `start_date` or `end_date` are used, the dates must be specified in UTC ISO 8601 format, e.g. `1970-01-01T00:00:00Z`. Don't use milliseconds.
+
+```python
+client.subaccounts.list_credit_transfers(
+    start_date='2022-03-29T14:16:56Z',
+    end_date='2023-06-12T17:20:01Z',
+    subaccount=SUBACCOUNT_API_KEY, # Use to show only the results that contain this key
+)
+```
+
+### Transfer credit between accounts
+
+Transferring credit is only possible for postpaid accounts, i.e. accounts that can have a negative balance. For prepaid and self-serve customers, account balances can be transferred between accounts (see below).
+
+```python
+client.subaccounts.transfer_credit(
+    from_=FROM_ACCOUNT,
+    to=TO_ACCOUNT,
+    amount=0.50,
+    reference='test credit transfer',
+)
+```
+
+### List balance transfers between accounts
+
+All fields are optional. If `start_date` or `end_date` are used, the dates must be specified in UTC ISO 8601 format, e.g. `1970-01-01T00:00:00Z`. Don't use milliseconds.
+
+```python
+client.subaccounts.list_balance_transfers(
+    start_date='2022-03-29T14:16:56Z',
+    end_date='2023-06-12T17:20:01Z',
+    subaccount=SUBACCOUNT_API_KEY, # Use to show only the results that contain this key
+)
+```
+
+### Transfer account balances between accounts
+
+```python
+client.subaccounts.transfer_balance(
+    from_=FROM_ACCOUNT,
+    to=TO_ACCOUNT,
+    amount=0.50,
+    reference='test balance transfer',
+)
+```
+
+### Transfer bought phone numbers between accounts
+
+```python
+client.subaccounts.transfer_balance(
+    from_=FROM_ACCOUNT,
+    to=TO_ACCOUNT,
+    number=NUMBER_TO_TRANSFER,
+    country='US',
+)
+```
+
+## Number Management API
+
+### Get numbers associated with your account
+
+```python
+client.numbers.get_account_numbers(size=25)
+```
+
+### Get numbers that are available to buy
+
+```python
+client.numbers.get_available_numbers('CA', size=25)
+```
+
+### Buy an available number
+
+```python
+params = {'country': 'US', 'msisdn': 'number_to_buy'}
+client.numbers.buy_number(params)
+
+# To buy a number for a subaccount
+params = {'country': 'US', 'msisdn': 'number_to_buy', 'target_api_key': SUBACCOUNT_API_KEY}
+client.numbers.buy_number(params)
+```
+
+### Cancel your subscription for a specific number
+
+```python
+params = {'country': 'US', 'msisdn': 'number_to_cancel'}
+client.numbers.cancel_number(params)
+
+# To cancel a number assigned to a subaccount
+params = {'country': 'US', 'msisdn': 'number_to_buy', 'target_api_key': SUBACCOUNT_API_KEY}
+client.numbers.cancel_number(params)
+```
+
+### Update the behaviour of a number that you own
+
+```python
+params = {"country": "US", "msisdn": "number_to_update", "moHttpUrl": "callback_url"}
+client.numbers.update_number(params)
 ```
 
 ## Pricing API
@@ -710,6 +1083,42 @@ response = client.application.delete_application(uuid)
 
 Docs: [https://developer.nexmo.com/api/application.v2#deleteApplication](https://developer.nexmo.com/api/application.v2#deleteApplication?utm_source=DEV_REL&utm_medium=github&utm_campaign=python-client-library#destroy-an-application)
 
+
+## Users API
+
+These API methods are part of the [Application (v2) API](https://developer.vonage.com/en/application/overview) but are a in separate module in the SDK. [See the API reference for more details](https://developer.vonage.com/en/api/application.v2#User).
+
+### List all Users
+
+```python
+client.users.list_users()
+```
+
+### Create a new user
+
+```python
+client.users.create_user() # Default values generated
+client.users.create_user(params={...}) # Specify custom values
+```
+
+### Get detailed information about a user
+
+```python
+client.users.get_user('USER_ID')
+```
+
+### Update user details
+
+```python
+client.users.update_user('USER_ID', params={...})
+```
+
+### Delete a user
+
+```python
+client.users.delete_user('USER_ID')
+```
+
 ## Validate webhook signatures
 
 ```python
@@ -728,34 +1137,32 @@ your account before you can validate webhook signatures.
 
 ## JWT parameters
 
-By default, the library generates short-lived tokens for JWT authentication.
+By default, the library generates tokens for JWT authentication that have an expiry time of 15 minutes. You should set the expiry time (`exp`) to an appropriate value for your organisation's own policies and/or your use case.
 
-Use the auth method to specify parameters for a longer life token or to
-specify a different token identifier:
+Use the `auth` method of the client class to specify custom parameters:
 
 ```python
 client.auth(nbf=nbf, exp=exp, jti=jti)
+# OR
+client.auth({'nbf': nbf, 'exp': exp, 'jti': jti})
 ```
 
 ## Overriding API Attributes
 
-In order to rewrite/get the value of variables used across all the Vonage classes Python uses `Call by Object Reference` that allows you to create a single client for Sms/Voice Classes. This means that if you make a change on a client instance this will be available for the Sms class.
+In order to rewrite/get the value of variables used across all the Vonage classes Python uses `Call by Object Reference` that allows you to create a single client to use with all API classes.
 
 An example using setters/getters with `Object references`:
 
 ```python
-from vonage import Client, Sms
+from vonage import Client
 
-#Defines the client
+# Define the client
 client = Client(key='YOUR_API_KEY', secret='YOUR_API_SECRET')
 print(client.host()) # using getter for host -- value returned: rest.nexmo.com
 
-#Define the sms instance
-sms = Sms(client)
-
-#Change the value in client
-client.host('mio.nexmo.com') #Change host to mio.nexmo.com - this change will be available for sms
-
+# Change the value in client
+client.host('mio.nexmo.com') # Change host to mio.nexmo.com - this change will be available for sms
+client.sms.send_message(params) # Sends an SMS to the host above
 ```
 
 ### Overriding API Host / Host Attributes
@@ -767,9 +1174,9 @@ from vonage import Client
 
 client = Client(key='YOUR_API_KEY', secret='YOUR_API_SECRET')
 print(client.host()) # return rest.nexmo.com
-client.host('mio.nexmo.com') # rewrites the host value to mio.nexmo.com
+client.host('newhost.vonage.com') # rewrites the host value to newhost.vonage.com
 print(client.api_host()) # returns api.vonage.com
-client.api_host('myapi.vonage.com') # rewrite the value of api_host
+client.api_host('myapi.vonage.com') # rewrite the value of api_host to myapi.vonage.com
 ```
 
 ## Frequently Asked Questions
@@ -788,14 +1195,18 @@ The following is a list of Vonage APIs and whether the Python SDK provides suppo
 | Dispatch API          |         Beta         |     ❌     |
 | External Accounts API |         Beta         |     ❌     |
 | Media API             |         Beta         |     ❌     |
+| Meetings API          | General Availability |     ✅     |
 | Messages API          | General Availability |     ✅     |
 | Number Insight API    | General Availability |     ✅     |
 | Number Management API | General Availability |     ✅     |
 | Pricing API           | General Availability |     ✅     |
+| Procative Connect API | General Availability |     ✅  (partially supported) |
 | Redact API            |   Developer Preview  |     ❌     |
 | Reports API           |         Beta         |     ❌     |
 | SMS API               | General Availability |     ✅     |
-| Verify API            | General Availability |     ✅     |
+| Subaccounts API       | General Availability |     ✅     |
+| Verify API v2         | General Availability |     ✅     |
+| Verify API v1 (Legacy)| General Availability |     ✅     |
 | Voice API             | General Availability |     ✅     |
 
 ### asyncio Support
@@ -806,7 +1217,7 @@ We don't currently support asyncio in the Python SDK but we are planning to do s
 
 ## Contributing
 
-We :heart: contributions! But if you plan to work on something big or controversial, please [contact us](mailto:devrel@vonage.com) first!
+We :heart: contributions! But if you plan to work on something big or controversial, please contact us by raising an issue first!
 
 We recommend working on `vonage-python-sdk` with a [virtualenv][virtualenv]. The following command will install all the Python dependencies you need to run the tests:
 
@@ -819,6 +1230,14 @@ The tests are all written with pytest. You run them with:
 ```bash
 make test
 ```
+
+We use [Black](https://black.readthedocs.io/en/stable/index.html) for code formatting, with our config in the `pyproject.toml` file. To ensure a PR follows the right format, you can set up and use our pre-commit settings with
+
+```bash
+pre-commit install
+```
+
+Then when you commit code, if it's not in the right format, it will be automatically fixed for you. After that, just commit again and everything should work as expected!
 
 ## License
 
