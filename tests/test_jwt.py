@@ -31,7 +31,7 @@ def vonage_jwt_mock(self, claims):
 
 def test_generate_application_jwt(client):
     with patch('vonage.client.JwtClient.generate_application_jwt', vonage_jwt_mock):
-        jwt = client._generate_application_jwt()
+        jwt = client.generate_application_jwt()
     assert jwt == test_jwt
 
 
@@ -47,7 +47,7 @@ def test_create_jwt_error_no_application_id_or_private_key():
     empty_client = Client()
 
     with raises(ClientError) as err:
-        empty_client._generate_application_jwt()
+        empty_client.generate_application_jwt()
     assert (
         str(err.value)
         == 'JWT generation failed. Check that you passed in valid values for "application_id" and "private_key".'

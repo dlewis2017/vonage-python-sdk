@@ -1,4 +1,5 @@
 from util import *
+from vonage import Client
 from vonage.errors import (
     ClientError,
     InvalidRoleError,
@@ -20,7 +21,7 @@ broadcast_id = '1748b7070a81464c9759c46ad10d3734'
 
 
 @responses.activate
-def test_create_default_session(client, dummy_data):
+def test_create_default_session(client: Client, dummy_data):
     stub(
         responses.POST,
         "https://video.api.vonage.com/session/create",
@@ -37,7 +38,7 @@ def test_create_default_session(client, dummy_data):
 
 
 @responses.activate
-def test_create_session_custom_archive_mode_and_location(client, dummy_data):
+def test_create_session_custom_archive_mode_and_location(client: Client, dummy_data):
     stub(
         responses.POST,
         "https://video.api.vonage.com/session/create",
@@ -55,7 +56,7 @@ def test_create_session_custom_archive_mode_and_location(client, dummy_data):
 
 
 @responses.activate
-def test_create_session_custom_media_mode(client, dummy_data):
+def test_create_session_custom_media_mode(client: Client, dummy_data):
     stub(
         responses.POST,
         "https://video.api.vonage.com/session/create",
@@ -135,7 +136,6 @@ def test_generate_client_token_custom_options(client):
 def test_check_client_token_headers(client):
     token = client.video.generate_client_token(session_id)
     headers = jwt.get_unverified_header(token)
-    print(headers)
     assert headers['alg'] == 'RS256'
     assert headers['typ'] == 'JWT'
 
@@ -152,7 +152,7 @@ def test_generate_client_token_invalid_expire_time(client):
 
 
 @responses.activate
-def test_get_stream(client, dummy_data):
+def test_get_stream(client: Client, dummy_data):
     stub(
         responses.GET,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/stream/{stream_id}",
@@ -166,7 +166,7 @@ def test_get_stream(client, dummy_data):
 
 
 @responses.activate
-def test_list_streams(client, dummy_data):
+def test_list_streams(client: Client, dummy_data):
     stub(
         responses.GET,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/stream",
@@ -180,7 +180,7 @@ def test_list_streams(client, dummy_data):
 
 
 @responses.activate
-def test_change_stream_layout(client, dummy_data):
+def test_change_stream_layout(client: Client, dummy_data):
     stub(
         responses.PUT,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/stream",
@@ -194,7 +194,7 @@ def test_change_stream_layout(client, dummy_data):
 
 
 @responses.activate
-def test_send_signal_to_all_participants(client, dummy_data):
+def test_send_signal_to_all_participants(client: Client, dummy_data):
     stub(
         responses.POST,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/signal",
@@ -208,7 +208,7 @@ def test_send_signal_to_all_participants(client, dummy_data):
 
 
 @responses.activate
-def test_send_signal_to_single_participant(client, dummy_data):
+def test_send_signal_to_single_participant(client: Client, dummy_data):
     stub(
         responses.POST,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/connection/{connection_id}/signal",
@@ -225,7 +225,7 @@ def test_send_signal_to_single_participant(client, dummy_data):
 
 
 @responses.activate
-def test_disconnect_client(client, dummy_data):
+def test_disconnect_client(client: Client, dummy_data):
     stub(
         responses.DELETE,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/connection/{connection_id}",
@@ -236,7 +236,7 @@ def test_disconnect_client(client, dummy_data):
 
 
 @responses.activate
-def test_mute_specific_stream(client, dummy_data):
+def test_mute_specific_stream(client: Client, dummy_data):
     stub(
         responses.POST,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/stream/{stream_id}/mute",
@@ -250,7 +250,7 @@ def test_mute_specific_stream(client, dummy_data):
 
 
 @responses.activate
-def test_mute_all_streams(client, dummy_data):
+def test_mute_all_streams(client: Client, dummy_data):
     stub(
         responses.POST,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/mute",
@@ -264,7 +264,7 @@ def test_mute_all_streams(client, dummy_data):
 
 
 @responses.activate
-def test_mute_all_streams_except_excluded_list(client, dummy_data):
+def test_mute_all_streams_except_excluded_list(client: Client, dummy_data):
     stub(
         responses.POST,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/mute",
@@ -280,7 +280,7 @@ def test_mute_all_streams_except_excluded_list(client, dummy_data):
 
 
 @responses.activate
-def test_disable_mute_all_streams(client, dummy_data):
+def test_disable_mute_all_streams(client: Client, dummy_data):
     stub(
         responses.POST,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/session/{session_id}/mute",
@@ -300,7 +300,7 @@ def test_disable_mute_all_streams(client, dummy_data):
 
 
 @responses.activate
-def test_list_archives_with_filters_applied(client, dummy_data):
+def test_list_archives_with_filters_applied(client: Client, dummy_data):
     stub(
         responses.GET,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/archive",
@@ -315,7 +315,7 @@ def test_list_archives_with_filters_applied(client, dummy_data):
 
 
 @responses.activate
-def test_create_new_archive(client, dummy_data):
+def test_create_new_archive(client: Client, dummy_data):
     stub(
         responses.POST,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/archive",
@@ -332,7 +332,7 @@ def test_create_new_archive(client, dummy_data):
 
 
 @responses.activate
-def test_get_archive(client, dummy_data):
+def test_get_archive(client: Client, dummy_data):
     stub(
         responses.GET,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/archive/{archive_id}",
@@ -348,11 +348,12 @@ def test_get_archive(client, dummy_data):
 
 
 @responses.activate
-def test_delete_archive(client, dummy_data):
+def test_delete_archive(client: Client, dummy_data):
     stub(
         responses.GET,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/archive/{archive_id}",
         status_code=204,
+        fixture_path='no_content.json',
     )
 
     assert client.video.delete_archive(archive_id=archive_id) == None
@@ -360,11 +361,12 @@ def test_delete_archive(client, dummy_data):
 
 
 @responses.activate
-def test_add_stream_to_archive(client, dummy_data):
+def test_add_stream_to_archive(client: Client, dummy_data):
     stub(
         responses.PATCH,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/archive/{archive_id}/streams",
         status_code=204,
+        fixture_path='no_content.json',
     )
 
     assert (
@@ -377,11 +379,12 @@ def test_add_stream_to_archive(client, dummy_data):
 
 
 @responses.activate
-def test_remove_stream_from_archive(client, dummy_data):
+def test_remove_stream_from_archive(client: Client, dummy_data):
     stub(
         responses.PATCH,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/archive/{archive_id}/streams",
         status_code=204,
+        fixture_path='no_content.json',
     )
 
     assert client.video.remove_stream_from_archive(archive_id=archive_id, stream_id='1234') == None
@@ -389,7 +392,7 @@ def test_remove_stream_from_archive(client, dummy_data):
 
 
 @responses.activate
-def test_stop_archive(client, dummy_data):
+def test_stop_archive(client: Client, dummy_data):
     stub(
         responses.POST,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/archive/{archive_id}/stop",
@@ -405,7 +408,7 @@ def test_stop_archive(client, dummy_data):
 
 
 @responses.activate
-def test_change_archive_layout(client, dummy_data):
+def test_change_archive_layout(client: Client, dummy_data):
     stub(
         responses.PUT,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/archive/{archive_id}/layout",
@@ -665,11 +668,12 @@ def test_change_broadcast_layout(client):
 
 
 @responses.activate
-def test_add_stream_to_broadcast(client, dummy_data):
+def test_add_stream_to_broadcast(client: Client, dummy_data):
     stub(
         responses.PATCH,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/broadcast/{broadcast_id}/streams",
         status_code=204,
+        fixture_path='no_content.json',
     )
 
     assert (
@@ -682,7 +686,7 @@ def test_add_stream_to_broadcast(client, dummy_data):
 
 
 @responses.activate
-def test_remove_stream_from_archive(client, dummy_data):
+def test_remove_stream_from_archive(client: Client, dummy_data):
     stub(
         responses.PATCH,
         f"https://video.api.vonage.com/v2/project/{client.application_id}/broadcast/{broadcast_id}/streams",

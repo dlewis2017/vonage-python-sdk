@@ -95,6 +95,8 @@ class Client:
         self.signature_secret = signature_secret
         self.signature_method = signature_method
 
+        self.application_id = application_id
+
         if self.signature_method in {
             "md5",
             "sha1",
@@ -444,9 +446,9 @@ class Client:
         return message
 
     def _create_jwt_auth_string(self):
-        return b"Bearer " + self._generate_application_jwt()
+        return b"Bearer " + self.generate_application_jwt()
 
-    def _generate_application_jwt(self):
+    def generate_application_jwt(self):
         try:
             return self._jwt_client.generate_application_jwt(self._jwt_claims)
         except AttributeError as err:

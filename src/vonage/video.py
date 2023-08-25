@@ -1,3 +1,9 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from vonage import Client
+
 from .errors import (
     InvalidRoleError,
     TokenExpiryError,
@@ -18,7 +24,7 @@ class Video:
     media_mode_values = {'routed', 'relayed'}
     token_roles = {'subscriber', 'publisher', 'moderator'}
 
-    def __init__(self, client):
+    def __init__(self, client: Client):
         self._client = client
 
     def create_session(self, session_options: dict = None):
@@ -313,7 +319,6 @@ class Video:
     def generate_client_token(self, session_id, token_options={}):
         now = int(time())
         claims = {
-            'application_id': self._client.application_id,
             'scope': 'session.connect',
             'session_id': session_id,
             'role': 'publisher',
@@ -339,10 +344,8 @@ class Video:
             claims['acl'] = token_options['acl']
 
         self.validate_client_token_options(claims)
-        headers = {'typ': 'JWT', 'alg': 'RS256'}
-        return jwt.encode(
-            payload=claims, key=self._client._private_key, algorithm='RS256', headers=headers
-        )
+        self._client.auth(claims)
+        return self._client.generate_application_jwt()
 
     def validate_client_token_options(self, claims):
         now = int(time())
