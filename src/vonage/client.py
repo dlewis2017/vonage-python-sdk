@@ -89,11 +89,11 @@ class Client:
         pool_maxsize=10,
         max_retries=3,
     ):
-        self.api_key = key or os.environ.get("VONAGE_API_KEY", None)
-        self.api_secret = secret or os.environ.get("VONAGE_API_SECRET", None)
+        self.api_key = key
+        self.api_secret = secret
 
-        self.signature_secret = signature_secret or os.environ.get("VONAGE_SIGNATURE_SECRET", None)
-        self.signature_method = signature_method or os.environ.get("VONAGE_SIGNATURE_METHOD", None)
+        self.signature_secret = signature_secret
+        self.signature_method = signature_method
 
         if self.signature_method in {
             "md5",
