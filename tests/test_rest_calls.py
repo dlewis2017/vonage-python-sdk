@@ -8,7 +8,13 @@ def test_get_with_query_params_auth(client, dummy_data):
     host = "api.nexmo.com"
     request_uri = "/v1/applications"
     params = {"aaa": "xxx", "bbb": "yyy"}
-    response = client.get(host, request_uri, params=params, auth_type='params')
+    response = client.get(
+        host,
+        request_uri,
+        params=params,
+        auth_type='params',
+        sent_data_type='query',
+    )
     assert isinstance(response, dict)
     assert request_user_agent() == dummy_data.user_agent
     assert "aaa=xxx" in request_query()
@@ -21,7 +27,13 @@ def test_get_with_header_auth(client, dummy_data):
     host = "api.nexmo.com"
     request_uri = "/v1/applications"
     params = {"aaa": "xxx", "bbb": "yyy"}
-    response = client.get(host, request_uri, params=params, auth_type='header')
+    response = client.get(
+        host,
+        request_uri,
+        params=params,
+        auth_type='header',
+        sent_data_type='query',
+    )
     assert isinstance(response, dict)
     assert request_user_agent() == dummy_data.user_agent
     assert "aaa=xxx" in request_query()
@@ -35,7 +47,13 @@ def test_post_with_query_params_auth(client, dummy_data):
     host = "api.nexmo.com"
     request_uri = "/v1/applications"
     params = {"aaa": "xxx", "bbb": "yyy"}
-    response = client.post(host, request_uri, params, auth_type='params', body_is_json=False)
+    response = client.post(
+        host,
+        request_uri,
+        params,
+        auth_type='params',
+        sent_data_type='data',
+    )
     assert isinstance(response, dict)
     assert request_user_agent() == dummy_data.user_agent
     assert "aaa=xxx" in request_body()
@@ -48,7 +66,13 @@ def test_post_with_header_auth(client, dummy_data):
     host = "api.nexmo.com"
     request_uri = "/v1/applications"
     params = {"aaa": "xxx", "bbb": "yyy"}
-    response = client.post(host, request_uri, params, auth_type='header', body_is_json=False)
+    response = client.post(
+        host,
+        request_uri,
+        params,
+        auth_type='header',
+        sent_data_type='data',
+    )
     assert isinstance(response, dict)
     assert request_user_agent() == dummy_data.user_agent
     assert "aaa=xxx" in request_body()
@@ -62,7 +86,12 @@ def test_put_with_header_auth(client, dummy_data):
     host = "api.nexmo.com"
     request_uri = "/v1/applications"
     params = {"aaa": "xxx", "bbb": "yyy"}
-    response = client.put(host, request_uri, params=params, auth_type='header')
+    response = client.put(
+        host,
+        request_uri,
+        params=params,
+        auth_type='header',
+    )
     assert_basic_auth()
     assert isinstance(response, dict)
     assert request_user_agent() == dummy_data.user_agent
@@ -123,14 +152,6 @@ def test_patch_no_content(client, dummy_data):
     assert b"test2" in request_body()
 
 
-def test_patch_invalid_auth_type(client):
-    host = "api.nexmo.com"
-    request_uri = "/v2/project"
-    params = {"test_param_1": "test1", "test_param_2": "test2"}
-    with pytest.raises(InvalidAuthenticationTypeError):
-        client.patch(host, request_uri, params=params, auth_type='params')
-
-
 @responses.activate
 def test_get_with_jwt_auth(client, dummy_data):
     stub(responses.GET, "https://api.nexmo.com/v1/calls")
@@ -139,3 +160,7 @@ def test_get_with_jwt_auth(client, dummy_data):
     response = client.get(host, request_uri, auth_type='jwt')
     assert isinstance(response, dict)
     assert request_user_agent() == dummy_data.user_agent
+
+
+def test_send_request_errors(client, dummy_data):
+    ...

@@ -6,6 +6,10 @@ class Account:
     pricing_auth_type = 'params'
     secrets_auth_type = 'header'
 
+    account_sent_data_type = 'data'
+    pricing_sent_data_type = 'query'
+    secrets_sent_data_type = 'json'
+
     allowed_pricing_types = {'sms', 'sms-transit', 'voice'}
 
     def __init__(self, client):
@@ -13,7 +17,9 @@ class Account:
 
     def get_balance(self):
         return self._client.get(
-            self._client.host(), "/account/get-balance", auth_type=Account.account_auth_type
+            self._client.host(),
+            "/account/get-balance",
+            auth_type=Account.account_auth_type,
         )
 
     def topup(self, params=None, **kwargs):
@@ -22,7 +28,7 @@ class Account:
             "/account/top-up",
             params or kwargs,
             auth_type=Account.account_auth_type,
-            body_is_json=False,
+            sent_data_type=Account.account_sent_data_type,
         )
 
     def get_country_pricing(self, country_code: str, type: str = 'sms'):
@@ -32,6 +38,7 @@ class Account:
             f"/account/get-pricing/outbound/{type}",
             {"country": country_code},
             auth_type=Account.pricing_auth_type,
+            sent_data_type=Account.pricing_sent_data_type,
         )
 
     def get_all_countries_pricing(self, type: str = 'sms'):
@@ -49,6 +56,7 @@ class Account:
             f"/account/get-prefix-pricing/outbound/{type}",
             {"prefix": prefix},
             auth_type=Account.pricing_auth_type,
+            sent_data_type=Account.pricing_sent_data_type,
         )
 
     def update_default_sms_webhook(self, params=None, **kwargs):
@@ -57,7 +65,7 @@ class Account:
             "/account/settings",
             params or kwargs,
             auth_type=Account.account_auth_type,
-            body_is_json=False,
+            sent_data_type=Account.account_sent_data_type,
         )
 
     def list_secrets(self, api_key):
@@ -81,7 +89,6 @@ class Account:
             f"/accounts/{api_key}/secrets",
             body,
             auth_type=Account.secrets_auth_type,
-            body_is_json=False,
         )
 
     def revoke_secret(self, api_key, secret_id):

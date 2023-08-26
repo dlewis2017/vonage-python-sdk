@@ -25,7 +25,6 @@ from platform import python_version
 import base64
 import hashlib
 import hmac
-import os
 import time
 
 from requests import Response
@@ -217,55 +216,55 @@ class Client:
 
         return hasher.hexdigest()
 
-    def get(self, host, request_uri, params=None, auth_type=None):
-        uri = f"https://{host}{request_uri}"
-        self._request_headers = self.headers
-
-        if auth_type == 'jwt':
-            self._request_headers['Authorization'] = self._create_jwt_auth_string()
-        elif auth_type == 'params':
-            params = dict(
-                params or {},
-                api_key=self.api_key,
-                api_secret=self.api_secret,
-            )
-        elif auth_type == 'header':
-            self._request_headers['Authorization'] = self._create_header_auth_string()
-        else:
-            raise InvalidAuthenticationTypeError(
-                f'Invalid authentication type. Must be one of "jwt", "header" or "params".'
-            )
-
-        logger.debug(
-            f"GET to {repr(uri)} with params {repr(params)}, headers {repr(self._request_headers)}"
-        )
-        return self.parse(
-            host,
-            self.session.get(
-                uri,
-                params=params,
-                headers=self._request_headers,
-                timeout=self.timeout,
-            ),
-        )
+    def get(self, host, request_uri, params={}, auth_type=None, sent_data_type='json'):
+        return self.send_request('GET', host, request_uri, params, auth_type, sent_data_type)
 
     def post(
         self,
         host,
         request_uri,
-        params,
+        params=None,
         auth_type=None,
-        body_is_json=True,
+        sent_data_type='json',
+        supports_signature_auth=False,
+    ):
+        return self.send_request(
+            'POST', host, request_uri, params, auth_type, sent_data_type, supports_signature_auth
+        )
+
+    def put(self, host, request_uri, params, auth_type=None):
+        return self.send_request('PUT', host, request_uri, params, auth_type)
+
+    def patch(self, host, request_uri, params, auth_type=None):
+        return self.send_request('PATCH', host, request_uri, params, auth_type)
+
+    def delete(self, host, request_uri, params=None, auth_type=None):
+        return self.send_request('DELETE', host, request_uri, params, auth_type)
+
+    def send_request(
+        self,
+        request_type: str,
+        host: str,
+        request_uri: str,
+        params: dict = {},
+        auth_type=None,
+        sent_data_type='json',
         supports_signature_auth=False,
     ):
         """
-        Low-level method to make a post request to an API server.
-        This method automatically adds authentication, picking the first applicable authentication method from the following:
-        - If the supports_signature_auth param is True, and the client was instantiated with a signature_secret,
-            then signature authentication will be used.
-        :param bool supports_signature_auth: Preferentially use signature authentication if a signature_secret was provided
-            when initializing this client.
+        Low-level method to make a request to an API server.
+        The supports_signature_auth parameter lets you preferentially use signature authentication if a
+        signature_secret was provided when initializing this client (only for the SMS API).
         """
+
+        allowed_request_types = {'GET', 'POST', 'PUT', 'PATCH', 'DELETE'}
+        if request_type not in allowed_request_types:
+            raise ClientError('Invalid request type.')
+
+        allowed_sent_data_types = {'json', 'data', 'query'}
+        if sent_data_type not in allowed_sent_data_types:
+            raise ClientError('Invalid sent_data type.')
+
         uri = f"https://{host}{request_uri}"
         self._request_headers = self.headers
 
@@ -288,105 +287,41 @@ class Client:
             )
 
         logger.debug(
-            f"POST to {repr(uri)} with params {repr(params)}, headers {repr(self._request_headers)}"
+            f'{request_type} to {repr(uri)} with params {repr(params)}, headers {repr(self._request_headers)}'
         )
-        if body_is_json:
+        if sent_data_type == 'json':
             return self.parse(
                 host,
-                self.session.post(
+                self.session.request(
+                    request_type,
                     uri,
                     json=params,
                     headers=self._request_headers,
                     timeout=self.timeout,
                 ),
             )
-        else:
+        elif sent_data_type == 'data':
             return self.parse(
                 host,
-                self.session.post(
+                self.session.request(
+                    request_type,
                     uri,
                     data=params,
                     headers=self._request_headers,
                     timeout=self.timeout,
                 ),
             )
-
-    def put(self, host, request_uri, params, auth_type=None):
-        uri = f"https://{host}{request_uri}"
-        self._request_headers = self.headers
-
-        if auth_type == 'jwt':
-            self._request_headers['Authorization'] = self._create_jwt_auth_string()
-        elif auth_type == 'header':
-            self._request_headers['Authorization'] = self._create_header_auth_string()
         else:
-            raise InvalidAuthenticationTypeError(
-                f'Invalid authentication type. Must be one of "jwt" or "header".'
+            return self.parse(
+                host,
+                self.session.request(
+                    request_type,
+                    uri,
+                    params=params,
+                    headers=self._request_headers,
+                    timeout=self.timeout,
+                ),
             )
-
-        logger.debug(
-            f"PUT to {repr(uri)} with params {repr(params)}, headers {repr(self._request_headers)}"
-        )
-        # All APIs that currently use put methods require a json-formatted body so don't need to check this
-        return self.parse(
-            host,
-            self.session.put(
-                uri,
-                json=params,
-                headers=self._request_headers,
-                timeout=self.timeout,
-            ),
-        )
-
-    def patch(self, host, request_uri, params, auth_type=None):
-        uri = f"https://{host}{request_uri}"
-        self._request_headers = self.headers
-
-        if auth_type == 'jwt':
-            self._request_headers['Authorization'] = self._create_jwt_auth_string()
-        elif auth_type == 'header':
-            self._request_headers['Authorization'] = self._create_header_auth_string()
-        else:
-            raise InvalidAuthenticationTypeError(f"""Invalid authentication type.""")
-
-        logger.debug(
-            f"PATCH to {repr(uri)} with params {repr(params)}, headers {repr(self._request_headers)}"
-        )
-        # Only newer APIs (that expect json-bodies) currently use this method, so we will always send a json-formatted body
-        return self.parse(
-            host,
-            self.session.patch(
-                uri,
-                json=params,
-                headers=self._request_headers,
-            ),
-        )
-
-    def delete(self, host, request_uri, params=None, auth_type=None):
-        uri = f"https://{host}{request_uri}"
-        self._request_headers = self.headers
-
-        if auth_type == 'jwt':
-            self._request_headers['Authorization'] = self._create_jwt_auth_string()
-        elif auth_type == 'header':
-            self._request_headers['Authorization'] = self._create_header_auth_string()
-        else:
-            raise InvalidAuthenticationTypeError(
-                f'Invalid authentication type. Must be one of "jwt", "header" or "params".'
-            )
-
-        logger.debug(f"DELETE to {repr(uri)} with headers {repr(self._request_headers)}")
-        if params is not None:
-            logger.debug(f"DELETE call has params {repr(params)}")
-        return self.parse(
-            host,
-            self.session.delete(
-                uri,
-                headers=self._request_headers,
-                timeout=self.timeout,
-                params=params,
-            ),
-        )
 
     def parse(self, host, response: Response):
         logger.debug(f"Response headers {repr(response.headers)}")

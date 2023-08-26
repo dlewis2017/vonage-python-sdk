@@ -28,6 +28,8 @@ def test_buy_number(numbers, dummy_data):
 
     assert isinstance(numbers.buy_number(params), dict)
     assert request_user_agent() == dummy_data.user_agent
+    print(request_body())
+    print(request_params())
     assert "country=US" in request_body()
     assert "msisdn=number" in request_body()
 

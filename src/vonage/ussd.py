@@ -1,5 +1,5 @@
 class Ussd:
-    defaults = {'auth_type': 'params', 'body_is_json': False}
+    defaults = {'auth_type': 'params', 'sent_data_type': 'data'}
 
     def __init__(self, client):
         self._client = client

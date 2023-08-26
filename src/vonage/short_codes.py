@@ -1,6 +1,6 @@
 class ShortCodes:
     auth_type = 'params'
-    defaults = {'auth_type': auth_type, 'body_is_json': False}
+    defaults = {'auth_type': auth_type, 'sent_data_type': 'data'}
 
     def __init__(self, client):
         self._client = client

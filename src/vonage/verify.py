@@ -3,7 +3,9 @@ from .errors import VerifyError, BlockedNumberError
 
 class Verify:
     auth_type = 'params'
-    defaults = {'auth_type': auth_type, 'body_is_json': False}
+    sent_data_type_GET = 'query'
+    sent_data_type_POST = 'data'
+    defaults = {'auth_type': auth_type, 'sent_data_type': sent_data_type_POST}
 
     def __init__(self, client):
         self._client = client
@@ -37,6 +39,7 @@ class Verify:
                 "/verify/search/json",
                 {"request_id": request},
                 auth_type=Verify.auth_type,
+                sent_data_type=Verify.sent_data_type_GET,
             )
         elif type(request) == list:
             response = self._client.get(
@@ -44,6 +47,7 @@ class Verify:
                 "/verify/search/json",
                 {"request_ids": request},
                 auth_type=Verify.auth_type,
+                sent_data_type=Verify.sent_data_type_GET,
             )
         else:
             raise VerifyError('At least one request ID must be provided.')

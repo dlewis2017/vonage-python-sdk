@@ -12,7 +12,6 @@ from .errors import (
     InvalidInputError,
 )
 
-import jwt
 import re
 from time import time
 from uuid import uuid4
@@ -66,7 +65,7 @@ class Video:
             '/session/create',
             params,
             auth_type=Video.auth_type,
-            body_is_json=False,
+            sent_data_type='data',
         )[0]
 
         media_mode = self.get_media_mode(params['p2p.preference'])

@@ -4,6 +4,7 @@ import json
 
 class NumberInsight:
     auth_type = 'params'
+    sent_data_type = 'query'
 
     def __init__(self, client):
         self._client = client
@@ -14,6 +15,7 @@ class NumberInsight:
             "/ni/basic/json",
             params or kwargs,
             auth_type=NumberInsight.auth_type,
+            sent_data_type=NumberInsight.sent_data_type,
         )
         self.check_for_error(response)
 
@@ -25,6 +27,7 @@ class NumberInsight:
             "/ni/standard/json",
             params or kwargs,
             auth_type=NumberInsight.auth_type,
+            sent_data_type=NumberInsight.sent_data_type,
         )
         self.check_for_error(response)
 
@@ -36,6 +39,7 @@ class NumberInsight:
             "/ni/advanced/json",
             params or kwargs,
             auth_type=NumberInsight.auth_type,
+            sent_data_type=NumberInsight.sent_data_type,
         )
         self.check_for_error(response)
 
@@ -50,6 +54,7 @@ class NumberInsight:
             "/ni/advanced/async/json",
             params or kwargs,
             auth_type=NumberInsight.auth_type,
+            sent_data_type=NumberInsight.sent_data_type,
         )
         print(json.dumps(response, indent=4))
         self.check_for_async_error(response)
