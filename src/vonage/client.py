@@ -316,43 +316,36 @@ class Client:
                 ),
             )
 
-    def parse(self, host, response: Response):
+    def parse(self, host: str, response: Response):
         logger.debug(f'Response headers {repr(response.headers)}')
+
         if response.status_code == 401:
             raise AuthenticationError('Authentication failed.')
         if response.status_code == 204:
             return None
-        if 200 <= response.status_code < 300:
+
+        try:
             content_type = response.headers['Content-Type'].split(';', 1)[0]
+        except KeyError:
+            raise ClientError(response, None, host)
+
+        if 200 <= response.status_code < 300:
             if content_type == "application/json":
                 try:
                     return response.json()
-                except JSONDecodeError as err:  # Get this when we get a 202 with no content
+                except JSONDecodeError:  # Get this when we get a 202 with no content
                     return None
             else:
-                return response.content
-        if 400 <= response.status_code < 500:
-            logger.warning(f"Client error: {response.status_code} {repr(response.content)}")
-            message = f"{response.status_code} response from {host}"
+                return response.text
 
-            try:
-                error_data = response.json()
-                message += str(error_data)
-            except JSONDecodeError:
-                pass
-            raise ClientError(message)
+        if 400 <= response.status_code < 500:
+            logger.warning(f'Client error: {response.status_code} {repr(response.content)}')
+            raise ClientError(response, content_type, host)
 
         if 500 <= response.status_code < 600:
             logger.warning(f"Server error: {response.status_code} {repr(response.content)}")
             message = f"{response.status_code} response from {host}"
             raise ServerError(message)
-
-    def _add_individual_errors(self, error_data):
-        message = ''
-        if 'errors' in error_data:
-            for error in error_data["errors"]:
-                message += f"\nError: {error}"
-        return message
 
     def _create_jwt_auth_string(self):
         return b"Bearer " + self.generate_application_jwt()
@@ -362,7 +355,7 @@ class Client:
             return self._jwt_client.generate_application_jwt(self._jwt_claims)
         except AttributeError as err:
             if '_jwt_client' in str(err):
-                raise ClientError(
+                raise VonageError(
                     'JWT generation failed. Check that you passed in valid values for "application_id" and "private_key".'
                 )
             else:

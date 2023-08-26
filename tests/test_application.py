@@ -1,8 +1,6 @@
 import json
 from util import *
 
-import vonage
-
 
 @responses.activate
 def test_list_applications(client, dummy_data):
@@ -84,57 +82,3 @@ def test_delete_application(client, dummy_data):
     assert client.application.delete_application("xx-xx-xx-xx") is None
     assert_basic_auth()
     assert request_user_agent() == dummy_data.user_agent
-
-
-@responses.activate
-def test_authentication_error(client):
-    responses.add(
-        responses.DELETE,
-        "https://api.nexmo.com/v2/applications/xx-xx-xx-xx",
-        status=401,
-    )
-    with pytest.raises(vonage.AuthenticationError):
-        client.application.delete_application("xx-xx-xx-xx")
-
-
-@responses.activate
-def test_client_error(client):
-    responses.add(
-        responses.DELETE,
-        "https://api.nexmo.com/v2/applications/xx-xx-xx-xx",
-        status=430,
-        body=json.dumps(
-            {
-                "type": "nope_error",
-                "title": "Nope",
-                "detail": "You really shouldn't have done that",
-            }
-        ),
-    )
-    with pytest.raises(vonage.ClientError) as exc_info:
-        client.application.delete_application("xx-xx-xx-xx")
-    assert str(exc_info.value) == "Nope: You really shouldn't have done that (nope_error)"
-
-
-@responses.activate
-def test_client_error_no_decode(client):
-    responses.add(
-        responses.DELETE,
-        "https://api.nexmo.com/v2/applications/xx-xx-xx-xx",
-        status=430,
-        body="{this: isnot_json",
-    )
-    with pytest.raises(vonage.ClientError) as exc_info:
-        client.application.delete_application("xx-xx-xx-xx")
-    assert str(exc_info.value) == "430 response from api.nexmo.com"
-
-
-@responses.activate
-def test_server_error(client):
-    responses.add(
-        responses.DELETE,
-        "https://api.nexmo.com/v2/applications/xx-xx-xx-xx",
-        status=500,
-    )
-    with pytest.raises(vonage.ServerError):
-        client.application.delete_application("xx-xx-xx-xx")

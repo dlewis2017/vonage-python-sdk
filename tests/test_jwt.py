@@ -2,7 +2,7 @@ from time import time
 from unittest.mock import patch
 from pytest import raises
 
-from vonage import Client, ClientError
+from vonage import Client, VonageError
 
 now = int(time())
 
@@ -46,7 +46,7 @@ def test_create_jwt_auth_string(client):
 def test_create_jwt_error_no_application_id_or_private_key():
     empty_client = Client()
 
-    with raises(ClientError) as err:
+    with raises(VonageError) as err:
         empty_client.generate_application_jwt()
     assert (
         str(err.value)

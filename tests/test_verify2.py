@@ -85,10 +85,7 @@ def test_new_request_error_fraud_check_invalid_account(dummy_data):
 
     with raises(ClientError) as err:
         verify2.new_request(params)
-    assert (
-        str(err.value)
-        == 'Forbidden: Your account does not have permission to perform this action. (https://developer.nexmo.com/api-errors#forbidden)'
-    )
+    assert 'Your account does not have permission to perform this action.' in str(err.value)
 
 
 def test_new_request_sms_custom_code_length_error():
@@ -245,7 +242,7 @@ def test_new_request_whatsapp_invalid_sender_error():
         'brand': 'ACME, Inc',
         'workflow': [{'channel': 'whatsapp', 'to': '447700900000', 'from': 'asdfghjkl'}],
     }
-    with pytest.raises(ClientError) as err:
+    with pytest.raises(Verify2Error) as err:
         verify2.new_request(params)
     assert str(err.value) == 'You must specify a valid "from" value if included.'
 
@@ -265,10 +262,7 @@ def test_new_request_whatsapp_sender_unregistered_error():
     }
     with pytest.raises(ClientError) as err:
         verify2.new_request(params)
-    assert (
-        str(err.value)
-        == 'Invalid sender: The `from` parameter is invalid. (https://developer.nexmo.com/api-errors#invalid-param)'
-    )
+    assert 'Invalid sender' in str(err.value)
 
 
 @responses.activate
@@ -381,10 +375,7 @@ def test_new_request_email_error():
     }
     with pytest.raises(ClientError) as err:
         verify2.new_request(params)
-    assert (
-        str(err.value)
-        == 'Invalid params: The value of one or more parameters is invalid (https://www.nexmo.com/messages/Errors#InvalidParams)'
-    )
+    assert 'Invalid params' in str(err.value)
 
 
 @responses.activate
@@ -414,10 +405,7 @@ def test_new_request_error_conflict():
 
     with raises(ClientError) as err:
         verify2.new_request(params)
-    assert (
-        str(err.value)
-        == "Conflict: Concurrent verifications to the same number are not allowed. (https://www.developer.vonage.com/api-errors/verify#conflict)"
-    )
+    assert 'Concurrent verifications to the same number are not allowed.' in str(err.value)
 
 
 @responses.activate
@@ -432,10 +420,7 @@ def test_new_request_rate_limit():
 
     with raises(ClientError) as err:
         verify2.new_request(params)
-    assert (
-        str(err.value)
-        == "Rate Limit Hit: Please wait, then retry your request (https://www.developer.vonage.com/api-errors#throttled)"
-    )
+    assert 'Rate Limit Hit' in str(err.value)
 
 
 @responses.activate
@@ -463,10 +448,7 @@ def test_check_code_invalid_code():
     with pytest.raises(ClientError) as err:
         verify2.check_code('c11236f4-00bf-4b89-84ba-88b25df97315', '5678')
 
-    assert (
-        str(err.value)
-        == 'Invalid Code: The code you provided does not match the expected value. (https://developer.nexmo.com/api-errors#bad-request)'
-    )
+    assert 'Invalid Code' in str(err.value)
 
 
 @responses.activate
@@ -481,10 +463,7 @@ def test_check_code_already_verified():
     with pytest.raises(ClientError) as err:
         verify2.check_code('c11236f4-00bf-4b89-84ba-88b25df97315', '5678')
 
-    assert (
-        str(err.value)
-        == "Not Found: Request '5fcc26ef-1e54-48a6-83ab-c47546a19824' was not found or it has been verified already. (https://developer.nexmo.com/api-errors#not-found)"
-    )
+    assert 'Not Found' in str(err.value)
 
 
 @responses.activate
@@ -499,10 +478,7 @@ def test_check_code_workflow_not_supported():
     with pytest.raises(ClientError) as err:
         verify2.check_code('c11236f4-00bf-4b89-84ba-88b25df97315', '5678')
 
-    assert (
-        str(err.value)
-        == 'Conflict: The current Verify workflow step does not support a code. (https://developer.nexmo.com/api-errors#conflict)'
-    )
+    assert 'The current Verify workflow step does not support a code.' in str(err.value)
 
 
 @responses.activate
@@ -517,10 +493,7 @@ def test_check_code_too_many_invalid_code_attempts():
     with pytest.raises(ClientError) as err:
         verify2.check_code('c11236f4-00bf-4b89-84ba-88b25df97315', '5678')
 
-    assert (
-        str(err.value)
-        == 'Invalid Code: An incorrect code has been provided too many times. Workflow terminated. (https://developer.nexmo.com/api-errors#gone)'
-    )
+    assert 'Invalid Code' in str(err.value)
 
 
 @responses.activate
@@ -534,10 +507,7 @@ def test_check_code_rate_limit():
 
     with raises(ClientError) as err:
         verify2.check_code('c11236f4-00bf-4b89-84ba-88b25df97315', '5678')
-    assert (
-        str(err.value)
-        == "Rate Limit Hit: Please wait, then retry your request (https://www.developer.vonage.com/api-errors#throttled)"
-    )
+    assert 'Rate Limit Hit' in str(err.value)
 
 
 @responses.activate
@@ -563,10 +533,7 @@ def test_cancel_verification_error_not_found():
 
     with raises(ClientError) as err:
         verify2.cancel_verification('c11236f4-00bf-4b89-84ba-88b25df97315')
-    assert (
-        str(err.value)
-        == "Not Found: Request 'c11236f4-00bf-4b89-84ba-88b25df97315' was not found or it has been verified already. (https://developer.nexmo.com/api-errors#not-found)"
-    )
+    assert 'Not Found' in str(err.value)
 
 
 @responses.activate

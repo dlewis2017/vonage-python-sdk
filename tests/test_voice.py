@@ -209,6 +209,6 @@ def test_get_recording(voice, dummy_data):
 
     assert isinstance(
         voice.get_recording("https://api.nexmo.com/v1/files/d6e47a2e-3414-11e8-8c2c-2f8b643ed957"),
-        bytes,
+        str,
     )
     assert request_user_agent() == dummy_data.user_agent

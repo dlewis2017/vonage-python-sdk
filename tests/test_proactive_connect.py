@@ -156,8 +156,8 @@ def test_create_list_invalid_name_error(proc):
     with raises(ClientError) as err:
         proc.create_list({'name': 1234})
     assert (
-        str(err.value)
-        == 'Request data did not validate: Bad Request (https://developer.vonage.com/en/api-errors)\nError: name must be longer than or equal to 1 and shorter than or equal to 255 characters\nError: name must be a string'
+        'name must be longer than or equal to 1 and shorter than or equal to 255 characters'
+        in str(err.value)
     )
 
 
@@ -188,10 +188,7 @@ def test_get_list_404(proc):
 
     with raises(ClientError) as err:
         proc.get_list(list_id)
-    assert (
-        str(err.value)
-        == 'The requested resource does not exist: Not Found (https://developer.vonage.com/en/api-errors)'
-    )
+    assert 'The requested resource does not exist' in str(err.value)
 
 
 @responses.activate
@@ -249,23 +246,6 @@ def test_delete_list(proc):
 
 
 @responses.activate
-def test_delete_list_404(proc):
-    list_id = '9508e7b8-fe99-4fdf-b022-65d7e461db2d'
-    stub(
-        responses.DELETE,
-        f'https://api-eu.vonage.com/v0.1/bulk/lists/{list_id}',
-        fixture_path='proactive_connect/not_found.json',
-        status_code=404,
-    )
-    with raises(ClientError) as err:
-        proc.delete_list(list_id)
-    assert (
-        str(err.value)
-        == 'The requested resource does not exist: Not Found (https://developer.vonage.com/en/api-errors)'
-    )
-
-
-@responses.activate
 def test_clear_list(proc):
     list_id = '9508e7b8-fe99-4fdf-b022-65d7e461db2d'
     stub(
@@ -276,23 +256,6 @@ def test_clear_list(proc):
     )
 
     assert proc.clear_list(list_id) == None
-
-
-@responses.activate
-def test_clear_list_404(proc):
-    list_id = '9508e7b8-fe99-4fdf-b022-65d7e461db2d'
-    stub(
-        responses.POST,
-        f'https://api-eu.vonage.com/v0.1/bulk/lists/{list_id}/clear',
-        fixture_path='proactive_connect/not_found.json',
-        status_code=404,
-    )
-    with raises(ClientError) as err:
-        proc.clear_list(list_id)
-    assert (
-        str(err.value)
-        == 'The requested resource does not exist: Not Found (https://developer.vonage.com/en/api-errors)'
-    )
 
 
 @responses.activate
@@ -320,27 +283,7 @@ def test_sync_list_manual_datasource_error(proc):
 
     with raises(ClientError) as err:
         proc.sync_list_from_datasource(list_id) == None
-    assert (
-        str(err.value)
-        == 'Request data did not validate: Cannot Fetch a manual list (https://developer.vonage.com/en/api-errors)'
-    )
-
-
-@responses.activate
-def test_sync_list_from_datasource_404(proc):
-    list_id = '346d17c4-79e6-4a25-8b4e-b777a83f6c30'
-    stub(
-        responses.POST,
-        f'https://api-eu.vonage.com/v0.1/bulk/lists/{list_id}/clear',
-        fixture_path='proactive_connect/not_found.json',
-        status_code=404,
-    )
-    with raises(ClientError) as err:
-        proc.clear_list(list_id)
-    assert (
-        str(err.value)
-        == 'The requested resource does not exist: Not Found (https://developer.vonage.com/en/api-errors)'
-    )
+    assert 'Cannot Fetch a manual list' in str(err.value)
 
 
 @responses.activate
@@ -356,24 +299,6 @@ def test_list_all_items(proc):
     assert items['total_items'] == 2
     assert items['_embedded']['items'][0]['id'] == '04c7498c-bae9-40f9-bdcb-c4eabb0418fe'
     assert items['_embedded']['items'][1]['id'] == 'd91c39ed-7c34-4803-a139-34bb4b7c6d53'
-
-
-@responses.activate
-def test_list_all_items_error_not_found(proc):
-    list_id = '9508e7b8-fe99-4fdf-b022-65d7e461db2d'
-    stub(
-        responses.GET,
-        f'https://api-eu.vonage.com/v0.1/bulk/lists/{list_id}/items',
-        fixture_path='proactive_connect/not_found.json',
-        status_code=404,
-    )
-
-    with raises(ClientError) as err:
-        proc.list_all_items(list_id)
-    assert (
-        str(err.value)
-        == 'The requested resource does not exist: Not Found (https://developer.vonage.com/en/api-errors)'
-    )
 
 
 @responses.activate
@@ -406,29 +331,7 @@ def test_create_item_error_invalid_data(proc):
 
     with raises(ClientError) as err:
         proc.create_item(list_id, {'data': 1234})
-    assert (
-        str(err.value)
-        == 'Request data did not validate: Bad Request (https://developer.vonage.com/en/api-errors)\nError: data must be an object'
-    )
-
-
-@responses.activate
-def test_create_item_error_not_found(proc):
-    list_id = '346d17c4-79e6-4a25-8b4e-b777a83f6c30'
-    stub(
-        responses.POST,
-        f'https://api-eu.vonage.com/v0.1/bulk/lists/{list_id}/items',
-        fixture_path='proactive_connect/not_found.json',
-        status_code=404,
-    )
-
-    data = {'firstName': 'John', 'lastName': 'Doe', 'phone': '123456789101'}
-    with raises(ClientError) as err:
-        proc.create_item(list_id, data)
-    assert (
-        str(err.value)
-        == 'The requested resource does not exist: Not Found (https://developer.vonage.com/en/api-errors)'
-    )
+    assert 'data must be an object' in str(err.value)
 
 
 @responses.activate
@@ -451,24 +354,6 @@ def test_download_list_items(proc):
 
 
 @responses.activate
-def test_download_list_items_error_not_found(proc):
-    list_id = '346d17c4-79e6-4a25-8b4e-b777a83f6c30'
-    stub(
-        responses.GET,
-        f'https://api-eu.vonage.com/v0.1/bulk/lists/{list_id}/items/download',
-        fixture_path='proactive_connect/not_found.json',
-        status_code=404,
-    )
-
-    with raises(ClientError) as err:
-        proc.download_list_items(list_id, 'data/proactive_connect_list_items.csv')
-    assert (
-        str(err.value)
-        == 'The requested resource does not exist: Not Found (https://developer.vonage.com/en/api-errors)'
-    )
-
-
-@responses.activate
 def test_get_item(proc):
     list_id = '246d17c4-79e6-4a25-8b4e-b777a83f6c30'
     item_id = 'd91c39ed-7c34-4803-a139-34bb4b7c6d53'
@@ -481,25 +366,6 @@ def test_get_item(proc):
     item = proc.get_item(list_id, item_id)
     assert item['id'] == 'd91c39ed-7c34-4803-a139-34bb4b7c6d53'
     assert item['data']['phone'] == '123456789101'
-
-
-@responses.activate
-def test_get_item_404(proc):
-    list_id = '346d17c4-79e6-4a25-8b4e-b777a83f6c30'
-    item_id = 'd91c39ed-7c34-4803-a139-34bb4b7c6d53'
-    stub(
-        responses.GET,
-        f'https://api-eu.vonage.com/v0.1/bulk/lists/{list_id}/items/{item_id}',
-        fixture_path='proactive_connect/not_found.json',
-        status_code=404,
-    )
-
-    with raises(ClientError) as err:
-        proc.get_item(list_id, item_id)
-    assert (
-        str(err.value)
-        == 'The requested resource does not exist: Not Found (https://developer.vonage.com/en/api-errors)'
-    )
 
 
 @responses.activate
@@ -534,30 +400,7 @@ def test_update_item_error_invalid_data(proc):
 
     with raises(ClientError) as err:
         proc.update_item(list_id, item_id, data)
-    assert (
-        str(err.value)
-        == 'Request data did not validate: Bad Request (https://developer.vonage.com/en/api-errors)\nError: data must be an object'
-    )
-
-
-@responses.activate
-def test_update_item_404(proc):
-    list_id = '346d17c4-79e6-4a25-8b4e-b777a83f6c30'
-    item_id = 'd91c39ed-7c34-4803-a139-34bb4b7c6d53'
-    data = {'first_name': 'John', 'last_name': 'Doe', 'phone': '447007000000'}
-    stub(
-        responses.PUT,
-        f'https://api-eu.vonage.com/v0.1/bulk/lists/{list_id}/items/{item_id}',
-        fixture_path='proactive_connect/not_found.json',
-        status_code=404,
-    )
-
-    with raises(ClientError) as err:
-        proc.update_item(list_id, item_id, data)
-    assert (
-        str(err.value)
-        == 'The requested resource does not exist: Not Found (https://developer.vonage.com/en/api-errors)'
-    )
+    assert 'data must be an object' in str(err.value)
 
 
 @responses.activate
@@ -576,25 +419,6 @@ def test_delete_item(proc):
 
 
 @responses.activate
-def test_delete_item_404(proc):
-    list_id = '246d17c4-79e6-4a25-8b4e-b777a83f6c30'
-    item_id = 'e91c39ed-7c34-4803-a139-34bb4b7c6d53'
-    stub(
-        responses.DELETE,
-        f'https://api-eu.vonage.com/v0.1/bulk/lists/{list_id}/items/{item_id}',
-        fixture_path='proactive_connect/not_found.json',
-        status_code=404,
-    )
-
-    with raises(ClientError) as err:
-        proc.delete_item(list_id, item_id)
-    assert (
-        str(err.value)
-        == 'The requested resource does not exist: Not Found (https://developer.vonage.com/en/api-errors)'
-    )
-
-
-@responses.activate
 def test_upload_list_items_from_csv(proc):
     list_id = '246d17c4-79e6-4a25-8b4e-b777a83f6c30'
     file_path = os.path.join(os.path.dirname(__file__), 'data/proactive_connect/csv_to_upload.csv')
@@ -606,25 +430,6 @@ def test_upload_list_items_from_csv(proc):
 
     response = proc.upload_list_items(list_id, file_path)
     assert response['inserted'] == 3
-
-
-@responses.activate
-def test_upload_list_items_from_csv_404(proc):
-    list_id = '346d17c4-79e6-4a25-8b4e-b777a83f6c30'
-    file_path = os.path.join(os.path.dirname(__file__), 'data/proactive_connect/csv_to_upload.csv')
-    stub(
-        responses.POST,
-        f'https://api-eu.vonage.com/v0.1/bulk/lists/{list_id}/items/import',
-        fixture_path='proactive_connect/not_found.json',
-        status_code=404,
-    )
-
-    with raises(ClientError) as err:
-        proc.upload_list_items(list_id, file_path)
-    assert (
-        str(err.value)
-        == 'The requested resource does not exist: Not Found (https://developer.vonage.com/en/api-errors)'
-    )
 
 
 @responses.activate

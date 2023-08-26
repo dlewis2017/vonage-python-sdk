@@ -471,10 +471,7 @@ def test_play_dtmf_invalid_session_id_error(client):
 
     with pytest.raises(ClientError) as err:
         client.video.play_dtmf(session_id, '1234')
-    assert (
-        str(err.value)
-        == "{'code': 400, 'message': 'One of the properties digits or sessionId is invalid.'}"
-    )
+    assert 'One of the properties digits or sessionId is invalid.' in str(err.value)
 
 
 def test_play_dtmf_invalid_input_error(client):

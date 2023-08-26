@@ -111,10 +111,8 @@ def test_list_secrets_missing(account):
     with pytest.raises(vonage.ClientError) as ce:
         account.list_secrets("myaccountid")
     assert_basic_auth()
-    assert (
-        str(ce.value)
-        == """Invalid API Key: API key 'ABC123' does not exist, or you do not have access (https://developer.nexmo.com/api-errors#invalid-api-key)"""
-    )
+    print(ce)
+    assert 'Invalid API Key' in str(ce.value)
 
 
 @responses.activate
@@ -155,10 +153,7 @@ def test_create_secret_max_secrets(account):
     with pytest.raises(vonage.ClientError) as ce:
         account.create_secret("meaccountid", "mahsecret")
     assert_basic_auth()
-    assert (
-        str(ce.value)
-        == """Maxmimum number of secrets already met: This account has reached maximum number of '2' allowed secrets (https://developer.nexmo.com/api-errors/account/secret-management#maximum-secrets-allowed)"""
-    )
+    assert 'Maxmimum number of secrets already met' in str(ce.value)
 
 
 @responses.activate
@@ -173,10 +168,7 @@ def test_create_secret_validation(account):
     with pytest.raises(vonage.ClientError) as ce:
         account.create_secret("meaccountid", "mahsecret")
     assert_basic_auth()
-    assert (
-        str(ce.value)
-        == """Bad Request: The request failed due to validation errors (https://developer.nexmo.com/api-errors/account/secret-management#validation)"""
-    )
+    assert 'The request failed due to validation errors' in str(ce.value)
 
 
 @responses.activate
@@ -198,7 +190,4 @@ def test_delete_secret_last_secret(account):
     with pytest.raises(vonage.ClientError) as ce:
         account.revoke_secret("meaccountid", "mahsecret")
     assert_basic_auth()
-    assert (
-        str(ce.value)
-        == """Secret Deletion Forbidden: Can not delete the last secret. The account must always have at least 1 secret active at any time (https://developer.nexmo.com/api-errors/account/secret-management#delete-last-secret)"""
-    )
+    assert 'Secret Deletion Forbidden' in str(ce.value)

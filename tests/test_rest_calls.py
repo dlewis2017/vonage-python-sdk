@@ -1,5 +1,7 @@
 from util import *
-from vonage.errors import InvalidAuthenticationTypeError
+from vonage.errors import AuthenticationError, ClientError, ServerError
+
+import json
 
 
 @responses.activate
@@ -160,3 +162,57 @@ def test_get_with_jwt_auth(client, dummy_data):
     response = client.get(host, request_uri, auth_type='jwt')
     assert isinstance(response, dict)
     assert request_user_agent() == dummy_data.user_agent
+
+
+@responses.activate
+def test_authentication_error(client):
+    responses.add(
+        responses.DELETE,
+        "https://api.nexmo.com/v2/applications/xx-xx-xx-xx",
+        status=401,
+    )
+    with pytest.raises(AuthenticationError):
+        client.application.delete_application("xx-xx-xx-xx")
+
+
+@responses.activate
+def test_client_error_json_body(client):
+    responses.add(
+        responses.DELETE,
+        "https://api.nexmo.com/v2/applications/xx-xx-xx-xx",
+        status=430,
+        body=json.dumps(
+            {
+                "type": "nope_error",
+                "title": "Nope",
+                "detail": "You really shouldn't have done that",
+            }
+        ),
+    )
+    with pytest.raises(ClientError) as err:
+        client.application.delete_application("xx-xx-xx-xx")
+    assert "You really shouldn't have done that" in str(err.value)
+
+
+@responses.activate
+def test_client_error_non_json_body(client):
+    responses.add(
+        responses.DELETE,
+        'https://api.nexmo.com/v2/applications/xx-xx-xx-xx',
+        status=430,
+        body='this: isnot_json',
+    )
+    with pytest.raises(ClientError) as err:
+        client.application.delete_application('xx-xx-xx-xx')
+    assert '430 response from api.nexmo.com' in str(err.value)
+
+
+@responses.activate
+def test_server_error(client):
+    responses.add(
+        responses.DELETE,
+        "https://api.nexmo.com/v2/applications/xx-xx-xx-xx",
+        status=500,
+    )
+    with pytest.raises(ServerError):
+        client.application.delete_application("xx-xx-xx-xx")
