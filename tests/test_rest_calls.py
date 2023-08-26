@@ -160,7 +160,3 @@ def test_get_with_jwt_auth(client, dummy_data):
     response = client.get(host, request_uri, auth_type='jwt')
     assert isinstance(response, dict)
     assert request_user_agent() == dummy_data.user_agent
-
-
-def test_send_request_errors(client, dummy_data):
-    ...

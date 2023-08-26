@@ -255,6 +255,7 @@ def test_delete_recording(meetings):
         responses.DELETE,
         'https://api-eu.vonage.com/beta/meetings/recordings/e5b73c98-c087-4ee5-b61b-0ea08204fc65',
         fixture_path='no_content.json',
+        status_code=204,
     )
 
     assert meetings.delete_recording(recording_id='e5b73c98-c087-4ee5-b61b-0ea08204fc65') == None
@@ -436,6 +437,7 @@ def test_delete_theme(meetings):
         responses.DELETE,
         "https://api-eu.vonage.com/beta/meetings/themes/90a21428-b74a-4221-adc3-783935d654db",
         fixture_path='no_content.json',
+        status_code=204,
     )
 
     theme = meetings.delete_theme('90a21428-b74a-4221-adc3-783935d654db')

@@ -257,28 +257,21 @@ class Client:
         signature_secret was provided when initializing this client (only for the SMS API).
         """
 
-        allowed_request_types = {'GET', 'POST', 'PUT', 'PATCH', 'DELETE'}
-        if request_type not in allowed_request_types:
-            raise ClientError('Invalid request type.')
-
-        allowed_sent_data_types = {'json', 'data', 'query'}
-        if sent_data_type not in allowed_sent_data_types:
-            raise ClientError('Invalid sent_data type.')
-
         uri = f"https://{host}{request_uri}"
         self._request_headers = self.headers
 
-        if supports_signature_auth and self.signature_secret:
-            params["api_key"] = self.api_key
-            params["sig"] = self.signature(params)
-        elif auth_type == 'jwt':
+        if auth_type == 'jwt':
             self._request_headers['Authorization'] = self._create_jwt_auth_string()
         elif auth_type == 'params':
-            params = dict(
-                params,
-                api_key=self.api_key,
-                api_secret=self.api_secret,
-            )
+            if supports_signature_auth and self.signature_secret:
+                params["api_key"] = self.api_key
+                params["sig"] = self.signature(params)
+            else:
+                params = dict(
+                    params,
+                    api_key=self.api_key,
+                    api_secret=self.api_secret,
+                )
         elif auth_type == 'header':
             self._request_headers['Authorization'] = self._create_header_auth_string()
         else:
@@ -324,50 +317,32 @@ class Client:
             )
 
     def parse(self, host, response: Response):
-        logger.debug(f"Response headers {repr(response.headers)}")
+        logger.debug(f'Response headers {repr(response.headers)}')
         if response.status_code == 401:
-            raise AuthenticationError("Authentication failed.")
-        elif response.status_code == 204:
+            raise AuthenticationError('Authentication failed.')
+        if response.status_code == 204:
             return None
-        elif 200 <= response.status_code < 300:
-            # Strip off any encoding from the content-type header:
-            try:
-                content_mime = response.headers.get("content-type").split(";", 1)[0]
-            except AttributeError:
-                if response.json() is None:
-                    return None
-            if content_mime == "application/json":
+        if 200 <= response.status_code < 300:
+            content_type = response.headers['Content-Type'].split(';', 1)[0]
+            if content_type == "application/json":
                 try:
                     return response.json()
-                except JSONDecodeError:
-                    pass
+                except JSONDecodeError as err:  # Get this when we get a 202 with no content
+                    return None
             else:
                 return response.content
-        elif 400 <= response.status_code < 500:
+        if 400 <= response.status_code < 500:
             logger.warning(f"Client error: {response.status_code} {repr(response.content)}")
             message = f"{response.status_code} response from {host}"
 
-            # Test for standard error format:
             try:
                 error_data = response.json()
-                if "type" in error_data and "title" in error_data and "detail" in error_data:
-                    title = error_data["title"]
-                    detail = error_data["detail"]
-                    type = error_data["type"]
-                    message = f"{title}: {detail} ({type}){self._add_individual_errors(error_data)}"
-                elif 'status' in error_data and 'message' in error_data and 'name' in error_data:
-                    message = (
-                        f'Status Code {error_data["status"]}: {error_data["name"]}: {error_data["message"]}'
-                        f'{self._add_individual_errors(error_data)}'
-                    )
-                else:
-                    message = str(error_data)
-
+                message += str(error_data)
             except JSONDecodeError:
                 pass
             raise ClientError(message)
 
-        elif 500 <= response.status_code < 600:
+        if 500 <= response.status_code < 600:
             logger.warning(f"Server error: {response.status_code} {repr(response.content)}")
             message = f"{response.status_code} response from {host}"
             raise ServerError(message)
