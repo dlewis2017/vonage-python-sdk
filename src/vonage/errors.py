@@ -36,11 +36,6 @@ class PricingTypeError(ClientError):
     """A pricing type was specified that is not allowed."""
 
 
-class RedactError(ClientError):
-
-    """Error related to the Redact class or Redact API."""
-
-
 class InvalidAuthenticationTypeError(ClientError):
     """An authentication method was specified that is not allowed."""
 

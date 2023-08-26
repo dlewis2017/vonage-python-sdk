@@ -9,7 +9,6 @@ from .messages import Messages
 from .number_insight import NumberInsight
 from .number_management import Numbers
 from .proactive_connect import ProactiveConnect
-from .redact import Redact
 from .short_codes import ShortCodes
 from .sms import Sms
 from .subaccounts import Subaccounts
