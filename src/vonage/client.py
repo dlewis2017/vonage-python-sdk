@@ -2,7 +2,7 @@ import vonage
 from vonage_jwt.jwt import JwtClient
 
 from .account import Account
-from .application import ApplicationV2, Application
+from .application import Application
 from .errors import *
 from .meetings import Meetings
 from .messages import Messages

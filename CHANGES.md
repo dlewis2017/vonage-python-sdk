@@ -7,7 +7,7 @@ Breaking changes:
 - Removed redundant intermediary `Error` class
 - Removed `Pay` action from NCCO builder
 - Removed `Redact` class and support for the Redact API as it's a dev preview product that's unsupported in the SDK
-- Removed `ApplicationV2` class. Use `Application` instead
+- Removed `ApplicationV2` class as V1 has been end-of-life for a significant amount of time and this new naming is in line with other APIs. Please use `Application` instead
 
 # 3.9.0
 - Dropped support for Python 3.7 as it's end-of-life and no longer receiving security updates

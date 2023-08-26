@@ -98,13 +98,6 @@ def messages(client):
 
 
 @pytest.fixture
-def application_v2(client):
-    import vonage
-
-    return vonage.ApplicationV2(client)
-
-
-@pytest.fixture
 def meetings(client):
     import vonage
 
