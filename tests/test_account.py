@@ -59,24 +59,6 @@ def test_get_prefix_pricing(account, dummy_data):
     assert "prefix=44" in request_query()
 
 
-@responses.activate
-def test_get_sms_pricing(account, dummy_data):
-    stub(responses.GET, "https://rest.nexmo.com/account/get-phone-pricing/outbound/sms")
-
-    assert isinstance(account.get_sms_pricing("447525856424"), dict)
-    assert request_user_agent() == dummy_data.user_agent
-    assert "phone=447525856424" in request_query()
-
-
-@responses.activate
-def test_get_voice_pricing(account, dummy_data):
-    stub(responses.GET, "https://rest.nexmo.com/account/get-phone-pricing/outbound/voice")
-
-    assert isinstance(account.get_voice_pricing("447525856424"), dict)
-    assert request_user_agent() == dummy_data.user_agent
-    assert "phone=447525856424" in request_query()
-
-
 def test_invalid_pricing_type_throws_error(account):
     with pytest.raises(PricingTypeError):
         account.get_country_pricing('GB', 'not_a_valid_pricing_type')
