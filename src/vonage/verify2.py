@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from vonage import Client
 
-from pydantic import BaseModel, ValidationError, validator, conint, constr
+from pydantic import BaseModel, ValidationError, field_validator, conint, constr
 from typing import Optional, List
 
 import copy
@@ -67,16 +67,14 @@ class Verify2:
     class VerifyRequest(BaseModel):
         brand: str
         workflow: List[dict]
-        locale: Optional[str]
-        channel_timeout: Optional[conint(ge=60, le=900)]
-        client_ref: Optional[str]
-        code_length: Optional[conint(ge=4, le=10)]
-        fraud_check: Optional[bool]
-        code: Optional[
-            constr(min_length=4, max_length=10, regex='^(?=[a-zA-Z0-9]{4,10}$)[a-zA-Z0-9]*$')
-        ]
+        locale: Optional[str] = None
+        channel_timeout: Optional[conint(ge=60, le=900)] = None
+        client_ref: Optional[str] = None
+        code_length: Optional[conint(ge=4, le=10)] = None
+        fraud_check: Optional[bool] = None
+        code: Optional[constr(min_length=4, max_length=10, pattern='^[a-zA-Z0-9]{4,10}$')] = None
 
-        @validator('workflow')
+        @field_validator('workflow')
         def check_valid_workflow(cls, v):
             for workflow in v:
                 Verify2._check_valid_channel(workflow)

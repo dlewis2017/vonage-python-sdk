@@ -98,7 +98,7 @@ def test_new_request_sms_custom_code_length_error():
 
     with raises(ValidationError) as err:
         verify2.new_request(params)
-    assert 'ensure this value has at least 4 characters' in str(err.value)
+    assert 'String should have at least 4 characters' in str(err.value)
 
 
 def test_new_request_sms_custom_code_character_error():
@@ -111,7 +111,7 @@ def test_new_request_sms_custom_code_character_error():
 
     with raises(ValidationError) as err:
         verify2.new_request(params)
-    assert 'string does not match regex' in str(err.value)
+    assert 'String should match pattern' in str(err.value)
 
 
 def test_new_request_invalid_channel_error():
@@ -138,7 +138,7 @@ def test_new_request_code_length_error():
 
     with raises(ValidationError) as err:
         verify2.new_request(params)
-    assert 'ensure this value is less than or equal to 10' in str(err.value)
+    assert 'Input should be less than or equal to 10' in str(err.value)
 
 
 def test_new_request_to_error():

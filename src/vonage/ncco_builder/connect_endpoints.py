@@ -8,10 +8,10 @@ class ConnectEndpoints:
         type: str = None
 
     class PhoneEndpoint(Endpoint):
-        type = Field('phone', const=True)
-        number: constr(regex=r'^[1-9]\d{6,14}$')
-        dtmfAnswer: Optional[constr(regex='^[0-9*#p]+$')]
-        onAnswer: Optional[Dict[str, HttpUrl]]
+        type: Optional[Literal['phone']] = 'phone'
+        number: constr(pattern=r'^[1-9]\d{6,14}$')
+        dtmfAnswer: Optional[constr(pattern='^[0-9*#p]+$')] = None
+        onAnswer: Optional[Dict[str, HttpUrl]] = None
 
     class AppEndpoint(Endpoint):
         type = Field('app', const=True)
@@ -21,12 +21,12 @@ class ConnectEndpoints:
         type = Field('websocket', const=True)
         uri: AnyUrl
         contentType: Literal['audio/l16;rate=16000', 'audio/l16;rate=8000']
-        headers: Optional[dict]
+        headers: Optional[dict] = None
 
     class SipEndpoint(Endpoint):
         type = Field('sip', const=True)
         uri: str
-        headers: Optional[dict]
+        headers: Optional[dict] = None
 
     class VbcEndpoint(Endpoint):
         type = Field('vbc', const=True)

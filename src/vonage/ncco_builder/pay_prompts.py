@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator
 from typing import Optional, Dict
 from typing_extensions import Literal
 
@@ -22,7 +22,7 @@ class PayPrompts:
             Dict[Literal['text'], str],
         ]
 
-        @validator('errors')
+        @field_validator('errors')
         def check_valid_error_format(cls, v, values):
             if values['type'] == 'CardNumber':
                 allowed_values = {'InvalidCardType', 'InvalidCardNumber', 'Timeout'}

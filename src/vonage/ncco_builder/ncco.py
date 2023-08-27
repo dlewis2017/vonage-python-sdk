@@ -1,13 +1,16 @@
-from pydantic import BaseModel, Field, validator, constr, confloat, conint
+from pydantic import (
+    BaseModel,
+    Field,
+    field_validator,
+    constr,
+    confloat,
+    conint,
+)
 from typing import Optional, Union, List
 from typing_extensions import Literal
 
 from .connect_endpoints import ConnectEndpoints
 from .input_types import InputTypes
-
-from deprecated import deprecated
-
-from deprecated import deprecated
 
 
 class Ncco:
@@ -22,19 +25,19 @@ class Ncco:
         split: Optional[Literal['conversation']]
         channels: Optional[conint(ge=1, le=32)]
         endOnSilence: Optional[conint(ge=3, le=10)]
-        endOnKey: Optional[constr(regex='^[0-9*#]$')]
+        endOnKey: Optional[constr(pattern='^[0-9*#]$')]
         timeOut: Optional[conint(ge=3, le=7200)]
         beepStart: Optional[bool]
         eventUrl: Optional[Union[List[str], str]]
         eventMethod: Optional[constr(to_upper=True)]
 
-        @validator('channels')
+        @field_validator('channels')
         def enable_split(cls, v, values):
             if values['split'] is None:
                 values['split'] = 'conversation'
             return v
 
-        @validator('eventUrl')
+        @field_validator('eventUrl')
         def ensure_url_in_list(cls, v):
             return Ncco._ensure_object_in_list(v)
 
@@ -53,11 +56,11 @@ class Ncco:
         canHear: Optional[List[str]]
         mute: Optional[bool]
 
-        @validator('musicOnHoldUrl')
+        @field_validator('musicOnHoldUrl')
         def ensure_url_in_list(cls, v):
             return Ncco._ensure_object_in_list(v)
 
-        @validator('mute')
+        @field_validator('mute')
         def can_mute(cls, v, values):
             if 'canSpeak' in values and values['canSpeak'] is not None:
                 raise ValueError('Cannot use mute option if canSpeak option is specified.')
@@ -68,7 +71,7 @@ class Ncco:
 
         action = Field('connect', const=True)
         endpoint: Union[dict, ConnectEndpoints.Endpoint, List[dict]]
-        from_: Optional[constr(regex=r'^[1-9]\d{6,14}$')]
+        from_: Optional[constr(pattern=r'^[1-9]\d{6,14}$')]
         randomFromNumber: Optional[bool]
         eventType: Optional[Literal['synchronous']]
         timeout: Optional[int]
@@ -79,7 +82,7 @@ class Ncco:
         eventMethod: Optional[constr(to_upper=True)]
         ringbackTone: Optional[str]
 
-        @validator('endpoint')
+        @field_validator('endpoint')
         def validate_endpoint(cls, v):
             if type(v) is dict:
                 return [ConnectEndpoints.create_endpoint_model_from_dict(v)]
@@ -88,11 +91,11 @@ class Ncco:
             else:
                 return [v]
 
-        @validator('from_')
+        @field_validator('from_')
         def set_from_field(cls, v, values):
             values['from'] = v
 
-        @validator('randomFromNumber')
+        @field_validator('randomFromNumber')
         def check_from_not_set(cls, v, values):
             if v is True and 'from' in values:
                 if values['from'] is not None:
@@ -101,11 +104,11 @@ class Ncco:
                     )
             return v
 
-        @validator('eventUrl')
+        @field_validator('eventUrl')
         def ensure_url_in_list(cls, v):
             return Ncco._ensure_object_in_list(v)
 
-        @validator('advancedMachineDetection')
+        @field_validator('advancedMachineDetection')
         def validate_advancedMachineDetection(cls, v):
             if 'behavior' in v and v['behavior'] not in ('continue', 'hangup'):
                 raise ValueError(
@@ -116,9 +119,6 @@ class Ncco:
                     'advancedMachineDetection["mode"] must be one of: "detect", "detect_beep".'
                 )
             return v
-
-        class Config:
-            smart_union = True
 
     class Talk(Action):
         """The talk action sends synthesized speech to a Conversation."""
@@ -141,7 +141,7 @@ class Ncco:
         bargeIn: Optional[bool]
         loop: Optional[conint(ge=0)]
 
-        @validator('streamUrl')
+        @field_validator('streamUrl')
         def ensure_url_in_list(cls, v):
             return Ncco._ensure_object_in_list(v)
 
@@ -160,18 +160,18 @@ class Ncco:
         eventUrl: Optional[Union[List[str], str]]
         eventMethod: Optional[constr(to_upper=True)]
 
-        @validator('type', 'eventUrl')
+        @field_validator('type', 'eventUrl')
         def ensure_value_in_list(cls, v):
             return Ncco._ensure_object_in_list(v)
 
-        @validator('dtmf')
+        @field_validator('dtmf')
         def ensure_input_object_is_dtmf_model(cls, v):
             if type(v) is dict:
                 return InputTypes.create_dtmf_model(v)
             else:
                 return v
 
-        @validator('speech')
+        @field_validator('speech')
         def ensure_input_object_is_speech_model(cls, v):
             if type(v) is dict:
                 return InputTypes.create_speech_model(v)
@@ -186,7 +186,7 @@ class Ncco:
         eventUrl: Union[List[str], str]
         eventMethod: Optional[constr(to_upper=True)]
 
-        @validator('eventUrl')
+        @field_validator('eventUrl')
         def ensure_url_in_list(cls, v):
             return Ncco._ensure_object_in_list(v)
 
