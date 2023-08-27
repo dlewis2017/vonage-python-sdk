@@ -2,8 +2,9 @@
 New features:
 - Added support for the Vonage Video API
 - Added error handling for APIs that return a 200 on failure
+- We now return the full status code and error message from an error response, instead of just specific sections
 
-Breaking changes:
+Removed:
 - Removed redundant intermediary `Error` class
 - Removed `Pay` action from NCCO builder
 - Removed `Redact` class and support for the Redact API as it's a dev preview product that's unsupported in the SDK
