@@ -32,7 +32,7 @@ class Verify2:
         self._remove_unnecessary_fraud_check(params)
         try:
             params_to_verify = copy.deepcopy(params)
-            Verify2.VerifyRequest.parse_obj(params_to_verify)
+            Verify2.VerifyRequest.model_validate(params_to_verify)
         except (ValidationError, Verify2Error) as err:
             raise err
 
@@ -75,6 +75,7 @@ class Verify2:
         code: Optional[constr(min_length=4, max_length=10, pattern='^[a-zA-Z0-9]{4,10}$')] = None
 
         @field_validator('workflow')
+        @classmethod
         def check_valid_workflow(cls, v):
             for workflow in v:
                 Verify2._check_valid_channel(workflow)
