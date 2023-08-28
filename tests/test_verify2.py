@@ -38,7 +38,7 @@ def test_new_request_sms_full():
         'locale': 'en-gb',
         'channel_timeout': 120,
         'client_ref': 'my client ref',
-        'code_length': 8,
+        'code_length': 10,
         'fraud_check': False,
         'brand': 'ACME, Inc',
         'workflow': [{'channel': 'sms', 'to': '447700900000', 'app_hash': 'asdfghjklqw'}],

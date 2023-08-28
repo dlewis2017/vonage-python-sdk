@@ -1,13 +1,12 @@
+from click import Option
 from pydantic import (
     BaseModel,
-    Field,
     field_validator,
     constr,
     confloat,
     conint,
 )
-from typing import Optional, Union, List
-from typing_extensions import Literal
+from typing import Optional, Union, List, Literal
 
 from .connect_endpoints import ConnectEndpoints
 from .input_types import InputTypes
@@ -20,24 +19,26 @@ class Ncco:
     class Record(Action):
         """Use the record action to record a call or part of a call."""
 
-        action = Field('record', const=True)
-        format: Optional[Literal['mp3', 'wav', 'ogg']]
-        split: Optional[Literal['conversation']]
-        channels: Optional[conint(ge=1, le=32)]
-        endOnSilence: Optional[conint(ge=3, le=10)]
-        endOnKey: Optional[constr(pattern='^[0-9*#]$')]
-        timeOut: Optional[conint(ge=3, le=7200)]
-        beepStart: Optional[bool]
-        eventUrl: Optional[Union[List[str], str]]
-        eventMethod: Optional[constr(to_upper=True)]
+        format: Literal['mp3', 'wav', 'ogg'] = None
+        split: Literal['conversation'] = None
+        channels: conint(ge=1, le=32) = None
+        endOnSilence: conint(ge=3, le=10) = None
+        endOnKey: constr(pattern='^[0-9*#]$') = None
+        timeOut: conint(ge=3, le=7200) = None
+        beepStart: bool = None
+        eventUrl: Union[List[str], str] = None
+        eventMethod: constr(to_upper=True) = None
+        action: Literal['record'] = 'record'
 
         @field_validator('channels')
+        @classmethod
         def enable_split(cls, v, values):
             if values['split'] is None:
                 values['split'] = 'conversation'
             return v
 
         @field_validator('eventUrl')
+        @classmethod
         def ensure_url_in_list(cls, v):
             return Ncco._ensure_object_in_list(v)
 
@@ -46,21 +47,23 @@ class Ncco:
         while preserving the communication context.
         Using conversation with the same name reuses the same persisted conversation."""
 
-        action = Field('conversation', const=True)
         name: str
-        musicOnHoldUrl: Optional[Union[List[str], str]]
-        startOnEnter: Optional[bool]
-        endOnExit: Optional[bool]
-        record: Optional[bool]
-        canSpeak: Optional[List[str]]
-        canHear: Optional[List[str]]
-        mute: Optional[bool]
+        musicOnHoldUrl: Union[List[str], str] = None
+        startOnEnter: bool = None
+        endOnExit: bool = None
+        record: bool = None
+        canSpeak: List[str] = None
+        canHear: List[str] = None
+        mute: bool = None
+        action: Literal['conversation'] = 'conversation'
 
         @field_validator('musicOnHoldUrl')
+        @classmethod
         def ensure_url_in_list(cls, v):
             return Ncco._ensure_object_in_list(v)
 
         @field_validator('mute')
+        @classmethod
         def can_mute(cls, v, values):
             if 'canSpeak' in values and values['canSpeak'] is not None:
                 raise ValueError('Cannot use mute option if canSpeak option is specified.')
@@ -69,20 +72,21 @@ class Ncco:
     class Connect(Action):
         """You can use the connect action to connect a call to endpoints such as phone numbers or a VBC extension."""
 
-        action = Field('connect', const=True)
         endpoint: Union[dict, ConnectEndpoints.Endpoint, List[dict]]
-        from_: Optional[constr(pattern=r'^[1-9]\d{6,14}$')]
-        randomFromNumber: Optional[bool]
-        eventType: Optional[Literal['synchronous']]
-        timeout: Optional[int]
-        limit: Optional[conint(le=7200)]
-        machineDetection: Optional[Literal['continue', 'hangup']]
-        advancedMachineDetection: Optional[dict]
-        eventUrl: Optional[Union[List[str], str]]
-        eventMethod: Optional[constr(to_upper=True)]
-        ringbackTone: Optional[str]
+        from_: constr(pattern=r'^[1-9]\d{6,14}$') = None
+        randomFromNumber: bool = None
+        eventType: Literal['synchronous'] = None
+        timeout: int = None
+        limit: conint(le=7200) = None
+        machineDetection: Literal['continue', 'hangup'] = None
+        advancedMachineDetection: dict = None
+        eventUrl: Union[List[str], str] = None
+        eventMethod: constr(to_upper=True) = None
+        ringbackTone: str = None
+        action: Literal['connect'] = 'connect'
 
         @field_validator('endpoint')
+        @classmethod
         def validate_endpoint(cls, v):
             if type(v) is dict:
                 return [ConnectEndpoints.create_endpoint_model_from_dict(v)]
@@ -92,10 +96,12 @@ class Ncco:
                 return [v]
 
         @field_validator('from_')
+        @classmethod
         def set_from_field(cls, v, values):
             values['from'] = v
 
         @field_validator('randomFromNumber')
+        @classmethod
         def check_from_not_set(cls, v, values):
             if v is True and 'from' in values:
                 if values['from'] is not None:
@@ -105,10 +111,12 @@ class Ncco:
             return v
 
         @field_validator('eventUrl')
+        @classmethod
         def ensure_url_in_list(cls, v):
             return Ncco._ensure_object_in_list(v)
 
         @field_validator('advancedMachineDetection')
+        @classmethod
         def validate_advancedMachineDetection(cls, v):
             if 'behavior' in v and v['behavior'] not in ('continue', 'hangup'):
                 raise ValueError(
@@ -123,48 +131,51 @@ class Ncco:
     class Talk(Action):
         """The talk action sends synthesized speech to a Conversation."""
 
-        action = Field('talk', const=True)
         text: constr(max_length=1500)
-        bargeIn: Optional[bool]
-        loop: Optional[conint(ge=0)]
-        level: Optional[confloat(ge=-1, le=1)]
-        language: Optional[str]
-        style: Optional[int]
-        premium: Optional[bool]
+        bargeIn: bool = None
+        loop: conint(ge=0) = None
+        level: confloat(ge=-1, le=1) = None
+        language: str = None
+        style: int = None
+        premium: bool = None
+        action: Literal['talk'] = 'talk'
 
     class Stream(Action):
         """The stream action allows you to send an audio stream to a Conversation."""
 
-        action = Field('stream', const=True)
         streamUrl: Union[List[str], str]
-        level: Optional[confloat(ge=-1, le=1)]
-        bargeIn: Optional[bool]
-        loop: Optional[conint(ge=0)]
+        level: confloat(ge=-1, le=1) = None
+        bargeIn: bool = None
+        loop: conint(ge=0) = None
+        action: Literal['stream'] = 'stream'
 
         @field_validator('streamUrl')
+        @classmethod
         def ensure_url_in_list(cls, v):
             return Ncco._ensure_object_in_list(v)
 
     class Input(Action):
         """Collect digits or speech input by the person you are are calling."""
 
-        action = Field('input', const=True)
         type: Union[
             Literal['dtmf', 'speech'],
             List[Literal['dtmf']],
             List[Literal['speech']],
             List[Literal['dtmf', 'speech']],
         ]
-        dtmf: Optional[Union[InputTypes.Dtmf, dict]]
-        speech: Optional[Union[InputTypes.Speech, dict]]
-        eventUrl: Optional[Union[List[str], str]]
-        eventMethod: Optional[constr(to_upper=True)]
+        dtmf: Union[InputTypes.Dtmf, dict] = None
+        speech: Union[InputTypes.Speech, dict] = None
+        eventUrl: Union[List[str], str] = None
+        eventMethod: constr(to_upper=True) = None
+        action: Literal['input'] = 'input'
 
         @field_validator('type', 'eventUrl')
+        @classmethod
         def ensure_value_in_list(cls, v):
             return Ncco._ensure_object_in_list(v)
 
         @field_validator('dtmf')
+        @classmethod
         def ensure_input_object_is_dtmf_model(cls, v):
             if type(v) is dict:
                 return InputTypes.create_dtmf_model(v)
@@ -172,6 +183,7 @@ class Ncco:
                 return v
 
         @field_validator('speech')
+        @classmethod
         def ensure_input_object_is_speech_model(cls, v):
             if type(v) is dict:
                 return InputTypes.create_speech_model(v)
@@ -181,12 +193,13 @@ class Ncco:
     class Notify(Action):
         """Use the notify action to send a custom payload to your event URL."""
 
-        action = Field('notify', const=True)
         payload: dict
         eventUrl: Union[List[str], str]
-        eventMethod: Optional[constr(to_upper=True)]
+        eventMethod: constr(to_upper=True) = None
+        action: Literal['notify'] = 'notify'
 
         @field_validator('eventUrl')
+        @classmethod
         def ensure_url_in_list(cls, v):
             return Ncco._ensure_object_in_list(v)
 

@@ -1,11 +1,12 @@
 from __future__ import annotations
+import locale
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from vonage import Client
 
 from pydantic import BaseModel, ValidationError, field_validator, conint, constr
-from typing import Optional, List
+from typing import List
 
 import copy
 import re
@@ -67,12 +68,12 @@ class Verify2:
     class VerifyRequest(BaseModel):
         brand: str
         workflow: List[dict]
-        locale: Optional[str] = None
-        channel_timeout: Optional[conint(ge=60, le=900)] = None
-        client_ref: Optional[str] = None
-        code_length: Optional[conint(ge=4, le=10)] = None
-        fraud_check: Optional[bool] = None
-        code: Optional[constr(min_length=4, max_length=10, pattern='^[a-zA-Z0-9]{4,10}$')] = None
+        locale: str = None
+        channel_timeout: conint(ge=60, le=900) = None
+        client_ref: str = None
+        code_length: conint(ge=4, le=10) = None
+        fraud_check: bool = None
+        code: constr(min_length=4, max_length=10, pattern='^[a-zA-Z0-9]{4,10}$') = None
 
         @field_validator('workflow')
         @classmethod
