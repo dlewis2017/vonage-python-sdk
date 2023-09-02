@@ -47,15 +47,6 @@ def test_connect_all_endpoints_from_model():
 
 
 def test_connect_endpoints_errors():
-    with pytest.raises(ValidationError) as err:
-        ConnectEndpoints.PhoneEndpoint(number='447000000000', onAnswer={'url': 'not-a-valid-url'})
-
-    with pytest.raises(ValidationError) as err:
-        ConnectEndpoints.PhoneEndpoint(
-            number='447000000000',
-            onAnswer={'url': 'http://example.com/answer', 'ringbackTone': 'not-a-valid-url'},
-        )
-
     with pytest.raises(ValueError) as err:
         ConnectEndpoints.create_endpoint_model_from_dict({'type': 'carrier_pigeon'})
     assert (

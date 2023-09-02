@@ -1,5 +1,5 @@
-from pydantic import BaseModel, HttpUrl, AnyUrl, constr
-from typing import Dict, Literal
+from pydantic import BaseModel, constr
+from typing import Literal
 
 
 class ConnectEndpoints:
@@ -9,7 +9,7 @@ class ConnectEndpoints:
     class PhoneEndpoint(Endpoint):
         number: constr(pattern=r'^[1-9]\d{6,14}$')
         dtmfAnswer: constr(pattern='^[0-9*#p]+$') = None
-        onAnswer: Dict[str, HttpUrl] = None
+        onAnswer: dict = None
         type: Literal['phone'] = 'phone'
 
     class AppEndpoint(Endpoint):
@@ -17,7 +17,7 @@ class ConnectEndpoints:
         type: Literal['app'] = 'app'
 
     class WebsocketEndpoint(Endpoint):
-        uri: AnyUrl
+        uri: str
         contentType: Literal['audio/l16;rate=16000', 'audio/l16;rate=8000']
         headers: dict = None
         type: Literal['websocket'] = 'websocket'
