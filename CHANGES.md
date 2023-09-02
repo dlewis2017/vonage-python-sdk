@@ -3,13 +3,17 @@ New features:
 - Added support for the Vonage Video API
 - Added error handling for APIs that return a 200 on failure
 - We now return the full status code and error message from an error response, instead of just specific sections
+- Updated use of Pydantic in the SDK. We now require Pydantic v2
 
 Removed:
 - Removed redundant intermediary `Error` class
 - Removed `Pay` action from NCCO builder
 - Removed `Redact` class and support for the Redact API as it's a dev preview product that's unsupported in the SDK
 - Removed `ApplicationV2` class as V1 has been end-of-life for a significant amount of time and this new naming is in line with other APIs. Please use `Application` instead
-- Removed `Account.get_sms_pricing` and `Account.get_voice_pricing` methods as the endpoints they call been deprecated for multiple years.
+- Removed `Account.get_sms_pricing` and `Account.get_voice_pricing` methods as the endpoints they call been deprecated for multiple years
+
+# 3.9.1
+- Updating Meetings API url to a `/v1` endpoint
 
 # 3.9.0
 - Dropped support for Python 3.7 as it's end-of-life and no longer receiving security updates
