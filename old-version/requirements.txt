@@ -1,0 +1,10 @@
+-e .
+pytest==7.2.0
+responses==0.22.0
+coverage
+pydantic>=2.3.0
+
+bump2version
+build
+twine
+pre-commit

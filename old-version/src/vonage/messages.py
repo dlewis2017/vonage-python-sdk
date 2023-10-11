@@ -47,7 +47,7 @@ class Messages:
         if params['channel'] not in Messages.valid_message_channels:
             raise MessagesError(
                 f"""
-            "{params['channel']}" is an invalid message channel. 
+            "{params['channel']}" is an invalid message channel.
             Must be one of the following types: {self.valid_message_channels}'
             """
             )
@@ -56,7 +56,7 @@ class Messages:
         if params['message_type'] not in self.valid_message_types[params['channel']]:
             raise MessagesError(
                 f"""
-                "{params['message_type']}" is not a valid message type for channel "{params["channel"]}". 
+                "{params['message_type']}" is not a valid message type for channel "{params["channel"]}".
                 Must be one of the following types: {self.valid_message_types[params["channel"]]}
             """
             )
