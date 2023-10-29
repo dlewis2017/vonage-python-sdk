@@ -1,8 +1,9 @@
 from urllib.parse import urlparse
+from vonage_jwt.verify_jwt import verify_signature
 
 
 class Voice:
-    auth_type = 'jwt'
+    auth_type = "jwt"
 
     def __init__(self, client):
         self._client = client
@@ -21,18 +22,24 @@ class Voice:
         if not params:
             params = kwargs
 
-            key = 'from'
+            key = "from"
             if key not in params:
-                params['random_from_number'] = True
+                params["random_from_number"] = True
 
         return self._client.post(
-            self._client.api_host(), "/v1/calls", params or kwargs, auth_type=Voice.auth_type
+            self._client.api_host(),
+            "/v1/calls",
+            params or kwargs,
+            auth_type=Voice.auth_type,
         )
 
     # Get call history paginated. Pass start and end dates to filter the retrieved information
     def get_calls(self, params=None, **kwargs):
         return self._client.get(
-            self._client.api_host(), "/v1/calls", params or kwargs, auth_type=Voice.auth_type
+            self._client.api_host(),
+            "/v1/calls",
+            params or kwargs,
+            auth_type=Voice.auth_type,
         )
 
     # Get a single call record by identifier
@@ -80,7 +87,9 @@ class Voice:
     # Stops audio recently played into specified call
     def stop_audio(self, uuid):
         return self._client.delete(
-            self._client.api_host(), f"/v1/calls/{uuid}/stream", auth_type=Voice.auth_type
+            self._client.api_host(),
+            f"/v1/calls/{uuid}/stream",
+            auth_type=Voice.auth_type,
         )
 
     # Stop a speech recently played into specified call
@@ -92,5 +101,10 @@ class Voice:
     def get_recording(self, url):
         hostname = urlparse(url).hostname
         headers = self._client.headers
-        headers['Authorization'] = self._client._create_jwt_auth_string()
-        return self._client.parse(hostname, self._client.session.get(url, headers=headers))
+        headers["Authorization"] = self._client._create_jwt_auth_string()
+        return self._client.parse(
+            hostname, self._client.session.get(url, headers=headers)
+        )
+
+    def verify_signature(self, token: str, signature: str) -> bool:
+        return verify_signature(token, signature)

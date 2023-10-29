@@ -1,10 +1,9 @@
 import os.path
 import time
-
 import jwt
+from unittest.mock import patch
 
-import vonage
-from vonage import Ncco
+from vonage import Client, Voice, Ncco
 from util import *
 
 
@@ -43,20 +42,20 @@ def test_create_call_with_ncco_builder(voice, dummy_data):
     stub(responses.POST, "https://api.nexmo.com/v1/calls")
 
     talk = Ncco.Talk(
-        text='Hello from Vonage!',
+        text="Hello from Vonage!",
         bargeIn=True,
         loop=3,
         level=0.5,
-        language='en-GB',
+        language="en-GB",
         style=1,
         premium=True,
     )
     ncco = Ncco.build_ncco(talk)
     voice.create_call(
         {
-            'to': [{'type': 'phone', 'number': '447449815316'}],
-            'from': {'type': 'phone', 'number': '447418370240'},
-            'ncco': ncco,
+            "to": [{"type": "phone", "number": "447449815316"}],
+            "from": {"type": "phone", "number": "447418370240"},
+            "ncco": ncco,
         }
     )
     assert (
@@ -149,7 +148,7 @@ def test_user_provided_authorization(dummy_data):
     stub(responses.GET, "https://api.nexmo.com/v1/calls/xx-xx-xx-xx")
 
     application_id = "different-application-id"
-    client = vonage.Client(application_id=application_id, private_key=dummy_data.private_key)
+    client = Client(application_id=application_id, private_key=dummy_data.private_key)
 
     nbf = int(time.time())
     exp = nbf + 3600
@@ -172,13 +171,13 @@ def test_authorization_with_private_key_path(dummy_data):
 
     private_key = os.path.join(os.path.dirname(__file__), "data/private_key.txt")
 
-    client = vonage.Client(
+    client = Client(
         key=dummy_data.api_key,
         secret=dummy_data.api_secret,
         application_id=dummy_data.application_id,
         private_key=private_key,
     )
-    voice = vonage.Voice(client)
+    voice = Voice(client)
     voice.get_call("xx-xx-xx-xx")
 
     token = jwt.decode(
@@ -204,11 +203,25 @@ def test_get_recording(voice, dummy_data):
     stub_bytes(
         responses.GET,
         "https://api.nexmo.com/v1/files/d6e47a2e-3414-11e8-8c2c-2f8b643ed957",
-        body=b'THISISANMP3',
+        body=b"THISISANMP3",
     )
 
     assert isinstance(
-        voice.get_recording("https://api.nexmo.com/v1/files/d6e47a2e-3414-11e8-8c2c-2f8b643ed957"),
+        voice.get_recording(
+            "https://api.nexmo.com/v1/files/d6e47a2e-3414-11e8-8c2c-2f8b643ed957"
+        ),
         str,
     )
     assert request_user_agent() == dummy_data.user_agent
+
+
+def test_verify_jwt_signature(voice: Voice):
+    with patch("vonage.Voice.verify_signature") as mocked_verify_signature:
+        mocked_verify_signature.return_value = True
+        assert voice.verify_signature("valid_token", "valid_signature")
+
+
+def test_verify_jwt_invalid_signature(voice: Voice):
+    with patch("vonage.Voice.verify_signature") as mocked_verify_signature:
+        mocked_verify_signature.return_value = False
+        assert voice.verify_signature("token", "invalid_signature") is False

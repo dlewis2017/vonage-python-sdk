@@ -12,6 +12,12 @@ Removed:
 - Removed `ApplicationV2` class as V1 has been end-of-life for a significant amount of time and this new naming is in line with other APIs. Please use `Application` instead
 - Removed `Account.get_sms_pricing` and `Account.get_voice_pricing` methods as the endpoints they call been deprecated for multiple years
 
+# 3.11.0
+- Add method to check JWT signatures of Voice API webhooks: `vonage.Voice.verify_signature`
+
+# 3.10.0
+- Indicating support for Python 3.12
+
 # 3.9.1
 - Updating Meetings API url to a `/v1` endpoint
 

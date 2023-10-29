@@ -347,6 +347,18 @@ client.voice.send_dtmf(response['uuid'], digits='1234')
 response = client.get_recording(RECORDING_URL)
 ```
 
+### Verify the Signature of a Webhook Sent by Vonage
+
+If signed webhooks are enabled (the default), Vonage will sign webhooks with the signature secret found in the [API Settings](https://dashboard.nexmo.com/settings) section of the Vonage Developer Dashboard.
+
+```python
+if client.voice.verify_signature('JWT_RECEIVED_FROM_VONAGE', 'MY_VONAGE_SIGNATURE_SECRET'):
+    print('Signature is valid!')
+else:
+    print('Signature is invalid!')
+```
+
+
 ## NCCO Builder
 
 The SDK contains a builder to help you create Call Control Objects (NCCOs) for use with the Vonage Voice API.
@@ -437,6 +449,7 @@ params = {
     ]
 }
 verify_request = verify2.new_request(params)
+check_url = verify_request['check_url'] # URL to continue with the silent auth workflow
 ```
 
 ### Send a verification code with custom options, including a custom code
@@ -1200,7 +1213,7 @@ The following is a list of Vonage APIs and whether the Python SDK provides suppo
 | Number Insight API    | General Availability |     ✅     |
 | Number Management API | General Availability |     ✅     |
 | Pricing API           | General Availability |     ✅     |
-| Procative Connect API | General Availability |     ✅  (partially supported) |
+| Proactive Connect API | General Availability |     ✅  (partially supported) |
 | Redact API            |   Developer Preview  |     ❌     |
 | Reports API           |         Beta         |     ❌     |
 | SMS API               | General Availability |     ✅     |
